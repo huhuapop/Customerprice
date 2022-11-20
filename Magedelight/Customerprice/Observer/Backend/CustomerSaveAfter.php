@@ -145,6 +145,7 @@ class CustomerSaveAfter implements ObserverInterface
                     }
                 }
             }
+
             if (isset($options['categoryoption'])) {
                 //echo "<pre>"; print_r($options['categoryoption']); exit();
                 foreach ($options['categoryoption'] as $key => $_options) {
@@ -166,6 +167,39 @@ class CustomerSaveAfter implements ObserverInterface
                     }
                 }
             }
+
+            //    use Magento\Framework\App\Bootstrap;
+//        require __DIR__ . '/app/bootstrap.php';
+//
+//                        $params = $_SERVER;
+//                        $bootstrap = Bootstrap::create(BP, $params);
+//                        $objectManager = $bootstrap->getObjectManager();
+//                        $_cacheTypeList = $objectManager->create('Magento\Framework\App\Cache\TypeListInterface');
+//                        $_cacheFrontendPool = $objectManager->create('Magento\Framework\App\Cache\Frontend\Pool');
+//                        $types = array('config','layout','block_html','collections','reflection','db_ddl','eav','config_integration','config_integration_api','full_page','translate','config_webservice');
+//                        foreach ($types as $type) {
+//                            $_cacheTypeList->cleanType($type);
+//                        }
+//                        foreach ($_cacheFrontendPool as $cacheFrontend) {
+//                            $cacheFrontend->getBackend()->clean();
+//                        }
+//        print_r(system('php bin/magento setup:clean'));
+//        print_r(system('php bin/magento setup:flush'));
+
+	  $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+	  $cacheManager = $objectManager->create('Magento\Framework\App\Cache\Manager');
+	  $cacheManager->flush($cacheManager->getAvailableTypes());
+
+//            $command = 'cd /var/www/html/magento && php bin/magento cache:clean && php bin/magento cache:flush';
+//            echo '<pre>' . shell_exec($command) . '</pre>';
+//        $append = 'Succesfully Recache';
+//        $result = ['error' => true, 'message' => $append];
+//        $resultJson = $this->resultJsonFactory->create();
+//        $resultJson->setData($result);
+//
+//        return $resultJson;
+//            throw new LocalizedException(__('test'));
+
         }
     }
 
