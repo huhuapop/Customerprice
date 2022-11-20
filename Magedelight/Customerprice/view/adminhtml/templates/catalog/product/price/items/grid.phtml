@@ -1,0 +1,114 @@
+<?php
+/**
+* Magedelight
+* Copyright (C) 2017 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Customerprice
+* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+*/
+?>
+<?php
+/**
+ * @var $block \Magento\Sales\Block\Adminhtml\Order\Create\Items\Grid
+ */
+?>
+
+<?php $_items =json_decode($this->getOptionValues()) ?>
+<?php if (empty($_items)): ?>
+        
+    <div id="order-items_grid">
+        <div class="admin__table-wrapper">
+            <table class="data-table admin__table-primary order-tables" id="attribute-options-table">
+                <thead>
+                    <tr class="headings">
+                        <th class="col-customer"><span><?php /* @escapeNotVerified */ echo __('Customer ID') ?></span></th>
+                        <th class="col-customer-name"><span><?php /* @escapeNotVerified */ echo __('Customer Name') ?></span></th>
+                        <th class="col-email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></th>
+                        <th class="col-special-price required-ppc"><span><?php /* @escapeNotVerified */ echo __('Special Price') ?></span></th>
+                        <th class="col-qty required-ppc"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+                        <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="even" id="no-customer">
+                        <td class="empty-text" colspan="100"><?php /* @escapeNotVerified */ echo __('No customer selected') ?></td>
+                    </tr>
+                </tbody>
+            </table>
+            <input type="hidden" data-form-part="product_form" id="option-count-check" value="" />
+             <input type="hidden" data-form-part="product_form" name="product_id" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+        </div>
+    </div>
+
+     
+<?php else: ?>
+
+        <div id="order-items_grid">
+            <div class="admin__table-wrapper">
+        <table class="data-table admin__table-primary order-tables" id="attribute-options-table">
+            <thead>
+                <tr class="headings">
+                    <th class="col-customer"><span><?php /* @escapeNotVerified */ echo __('Customer ID') ?></span></th>
+                    <th class="col-customer-name"><span><?php /* @escapeNotVerified */ echo __('Customer Name') ?></span></th>
+                    <th class="col-email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></th>
+                    <th class="col-special-price"><span><?php /* @escapeNotVerified */ echo __('Special Price') ?></span></th>
+                    <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
+                    <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+                </tr>
+            </thead>
+        
+                <?php $i = 0 ?>
+                
+                <tbody class="<?php /* @escapeNotVerified */ echo($i%2) ? 'even' : 'odd' ?>">
+               
+                <tr class="even" id="no-customer" style="display:none">
+                        <td class="empty-text" colspan="100"><?php /* @escapeNotVerified */ echo __('No customer selected') ?></td>
+                    </tr>
+                <?php foreach ($_items as $_item):$i++ ?>
+                    <tr class="option-row">
+                        <td>
+                            <span><?php echo $_item->cid ?></span>
+                            <input data-form-part="product_form" type="hidden" name="option[value][<?php echo $_item->id ?>][cid]" value="<?php echo $_item->cid ?>" />
+                        </td> 
+                        <td>
+                            <span><?php echo $_item->cname ?></span>
+                            <input data-form-part="product_form" type="hidden" name="option[value][<?php echo $_item->id ?>][cname]" value="<?php echo $_item->cname ?>" />
+                        </td> 
+                        <td>
+                            <span><?php echo $_item->email ?></span>
+                            <input data-form-part="product_form" type="hidden" name="option[value][<?php echo $_item->id ?>][email]" value="<?php echo $_item->email ?>" />
+                        </td>
+                        <td>
+                            <input data-form-part="product_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required" type="text" name="option[value][<?php echo $_item->id ?>][newprice]" value="<?php echo $_item->newprice ?>">
+                        </td> 
+                        <td>
+                            <input data-form-part="product_form" style="width:20px;" class="input-text admin__control-text qty required-entry validate-greater-than-zero" type="text" name="option[value][<?php echo $_item->id ?>][qty]" value="<?php echo $_item->qty ?>"> and above
+                        </td>  
+                        <td id="delete_button_container_<?php echo $_item->id ?>">
+                        <input data-form-part="product_form" type="hidden" class="delete-flag" name="option[value][<?php echo $_item->id ?>][del]" value="" />
+                        <input data-form-part="product_form" type="hidden" class="delete-flag" name="option[value][<?php echo $_item->id ?>][pid]" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+                        <button class="action-delete delete-option" type="button"><span>Remove Product</span></button> 
+                        </td> 
+
+                    </tr>
+
+                <?php endforeach; ?>
+                </tbody>
+                
+        </table>
+        <input type="hidden" data-form-part="product_form" id="option-count-check" value="" />
+        <input type="hidden" data-form-part="product_form" name="product_id" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+       
+            </div>
+        </div>
+
+
+   
+
+<?php endif; ?>
+
+
+

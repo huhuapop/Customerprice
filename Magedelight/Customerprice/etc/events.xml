@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="../../../../../../lib/internal/Magento/Framework/Event/etc/events.xsd">
+    <event name="layout_render_before">
+       <observer name="Magedelight_customerprice_check_util" instance="Magedelight\Customerprice\Observer\Util" />
+    </event>
+    <event name="admin_system_config_changed_section_customerprice">
+        <observer name="custom_admin_system_config_changed_section_customerprice" instance="Magedelight\Customerprice\Observer\Mdkc"/>
+        <observer name="Magedelight_customerprice_frd_track" instance="Magedelight\Customerprice\Observer\Mdfrd" />
+    </event>
+</config>

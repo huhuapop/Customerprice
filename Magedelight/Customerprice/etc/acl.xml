@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+* Magedelight
+* Copyright (C) 2017 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Customerprice
+* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Acl/etc/acl.xsd">
+    <acl>
+    	<resources>
+			<resource id="Magento_Backend::admin">
+				<resource id="Magedelight_Base::root" title="Magedelight" sortOrder="51">
+					<resource id="Magedelight_Base::md_modules">
+						<resource id="Magedelight_Customerprice::root" title="Magedelight Price Per Customer" sortOrder="51" >
+							<resource id="Magedelight_Customerprice::config_root" title="Price Per Customer Configuration" sortOrder="51" />
+						</resource>
+					</resource>
+				</resource>
+				<resource id="Magento_Backend::stores">
+					<resource id="Magento_Backend::stores_settings">
+						<resource id="Magento_Config::config">
+							<resource id="Magedelight_Base::config_root">
+								<resource id="Magedelight_Customerprice::config_customerprice" title="Price Per Customer" sortOrder="90" />
+							</resource>
+						</resource>
+					</resource>
+				</resource>
+			</resource>
+		</resources>
+	</acl>
+</config>

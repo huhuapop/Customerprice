@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<!--
+/**
+* Magedelight
+* Copyright (C) 2017 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Customerprice
+* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <virtualType name="Magento\Catalog\Ui\DataProvider\Product\Form\Modifier\Pool">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="customerprice" xsi:type="array">
+                    <item name="class" xsi:type="string">Magedelight\Customerprice\Ui\DataProvider\Product\Modifier\Customerprice</item>
+                    <item name="sortOrder" xsi:type="number">200</item>
+                </item>
+            </argument>
+        </arguments>
+    </virtualType>
+
+     <type name="Magedelight\Customerprice\Ui\DataProvider\Product\Modifier\Customerprice">
+        <arguments>
+            <argument name="formName" xsi:type="string">product_form</argument>
+            <argument name="dataScopeName" xsi:type="string">product_form.product_form</argument>
+            <argument name="dataSourceName" xsi:type="string">product_form.product_form_data_source</argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Backend\Model\Menu\Item">
+        <plugin name="md_customerprice_menu_item_newtab" type="Magedelight\Customerprice\Plugin\Magento\Backend\Model\Menu\Item" />
+    </type>
+</config>

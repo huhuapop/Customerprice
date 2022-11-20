@@ -1,0 +1,105 @@
+<?php
+/**
+* Magedelight
+* Copyright (C) 2017 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Customerprice
+* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+ */
+?>
+<?php
+/**
+ * @var $block \Magento\Sales\Block\Adminhtml\Order\Create\Items\Grid
+ */
+?>
+
+<?php $_items = json_decode($this->getOptionValues());
+ 
+?>
+<?php if (empty($_items)): ?>
+    <form id="edit_form" data-form="edit_form" method="post" enctype="multipart/form-data" >
+        <div id="order-items_grid">
+            <div class="admin__table-wrapper">
+                <table class="data-table admin__table-primary order-tables" id="attribute-options-table-category">
+                    <thead>
+                        <tr class="headings">
+                            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Category ID') ?></span></th>
+                            <th class="col-product-name"><span><?php /* @escapeNotVerified */ echo __('Category Name') ?></span></th>
+                            
+                            <th class="col-special-price"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+                            <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="even" id="no-product">
+                            <td class="empty-text" colspan="100"><?php /* @escapeNotVerified */ echo __('No Category selected') ?></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <input type="hidden" data-form-part="customer_form" id="option-count-check" value="" />
+                <input type="hidden" data-form-part="customer_form" name="customer_id" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+            </div>
+        </div>
+    </form>
+<?php else: ?>
+    <form id="edit_form" data-form="edit_form" method="post" enctype="multipart/form-data" >
+        <div id="order-items_grid">
+            <div class="admin__table-wrapper">
+                <table class="data-table admin__table-primary order-tables" id="attribute-options-table-category">
+                    <thead>
+                        <tr class="headings">
+                            <th class="col-product"><span><?php /* @escapeNotVerified */ echo __('Category ID') ?></span></th>
+                            <th class="col-product-name"><span><?php /* @escapeNotVerified */ echo __('Category Name') ?></span></th>
+                            
+                            <th class="col-special-price"><span><?php /* @escapeNotVerified */ echo __('Discount') ?></span></th>
+                            <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+                        </tr>
+                    </thead>
+
+                    <?php $i = 0 ?>
+
+                    <tbody class="<?php /* @escapeNotVerified */ echo($i % 2) ? 'even' : 'odd' ?>">
+
+                        <tr class="even" id="no-product" style="display:none">
+                            <td class="empty-text" colspan="100"><?php /* @escapeNotVerified */ echo __('No product selected') ?></td>
+                        </tr>
+
+                        <?php
+                        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                        $priceHelper = $objectManager->create('Magento\Framework\Pricing\Helper\Data');
+                        ?>
+                        <?php foreach ($_items as $_item):$i++ ?>
+                            <tr class="option-row " id = "category-row-<?php echo $_item->id ?>">
+                                <td>
+                                    <span><?php echo $_item->pid ?></span>
+                                    <input type="hidden" data-form-part="customer_form" name="categoryoption[value][<?php echo $_item->id ?>][pid]" value="<?php echo $_item->pid ?>" />
+                                </td> 
+                                <td>
+                                    <span><?php echo $_item->pname ?></span>
+                                    <input type="hidden" data-form-part="customer_form" name="categoryoption[value][<?php echo $_item->id ?>][pname]" value="<?php echo $_item->pname ?>" />
+                                </td> 
+                                
+                                <td>
+                                    <input style="width:50%;" data-form-part="customer_form" data-form-part="customer_form" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required validate-number validate-digits-range digits-range-0-100" type="text" name="categoryoption[value][<?php echo $_item->id ?>][discount]" value="<?php echo $_item->discount ?>"> &nbsp; <strong>%</strong>
+                                </td>  
+                                <td id="delete_button_container_<?php echo $_item->id ?>">
+                                    <input type="hidden" data-form-part="customer_form" class="delete-flag" name="categoryoption[value][<?php echo $_item->id ?>][cid]" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+                                    <button class="delete-option delete-category-save" rel="<?php echo $_item->id ?>" type="button"><span>Remove Category</span></button> 
+                                </td> 
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+
+                </table>
+                <input type="hidden" data-form-part="customer_form" id="option-count-check" value="" />
+                <input type="hidden" data-form-part="customer_form" name="customer_id" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+
+            </div>
+        </div>
+    </form>
+<?php endif; ?>
+
+

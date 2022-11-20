@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/**
+* Magedelight
+* Copyright (C) 2017 Magedelight <info@Magedelight.com>
+*
+* @category Magedelight
+* @package Magedelight_Customerprice
+* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+* @author Magedelight <info@Magedelight.com>
+*/
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <section id="customerprice" translate="label" type="text" sortOrder="140" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Price Per Customer</label>
+            <tab>magedelight</tab>
+            <class>md_section_customerprice</class>
+            <resource>Magedelight_Customerprice::config_customerprice</resource>
+            <group id="license" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>License Configuration</label>
+                <field id="serial_key" translate="label" type="text" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Serial Key</label>
+                </field>
+                <field id="activation_key" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Activation Key</label>
+                </field>
+            </group>
+            <group id="general" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Settings</label>
+                <field id="select_website" translate="label" type="multiselect" sortOrder="0" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Select Website</label>
+                    <source_model>Magedelight\Customerprice\Model\Config\Source\Website</source_model>
+                    <comment>Please save serial and activation keys to get the available options.</comment>
+                </field>
+                <field id="enable" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Module</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Link Name</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="page_title" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Page Title</label>
+                    <validate>required-entry</validate>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="identifier" translate="label" type="text" sortOrder="4" showInDefault="1" showInWebsite="0" showInStore="0">
+                    <label>URL Identifier</label>
+                    <validate>required-entry validate-identifier</validate>
+                    <depends>
+                        <field id="enable">1</field>
+                    </depends>
+                </field>
+                <field id="advanceprice" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Apply Global Discount On Advanced Price</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="top_enable" translate="label" type="select" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Link In Top</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="footer_enable" translate="label" type="select" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Show Link In Footer</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                </field>
+                <field id="layout" translate="label" type="select" sortOrder="7" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Price Per Customer Page Layout</label>
+                    <source_model>Magedelight\Customerprice\Model\Source\Layouts</source_model>
+                </field> 
+            </group>            
+            <group id="sample" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Import Export for Product Wise</label>
+                <field id="export" translate="label" type="Magedelight\Customerprice\Block\Adminhtml\Form\Field\Export" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Export</label>
+                </field>
+                <field id="import" translate="label" type="Magedelight\Customerprice\Block\Adminhtml\Form\Field\Import" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Import</label>
+                    <backend_model>Magedelight\Customerprice\Model\Config\Backend\Import</backend_model>
+                    <comment>
+                        <![CDATA[<span style="color:red !important; font-weight:bold;">Warning: </span>You can not import configurable, bundle and grouped product.]]>
+                    </comment>
+                </field>
+            </group>
+            <group id="categorysimple" translate="label" type="text" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Import Export For Category Wise</label>
+                <field id="export" translate="label" type="Magedelight\Customerprice\Block\Adminhtml\Form\Field\Exportcategory" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Export</label>
+                </field>
+                <field id="import" translate="label" type="Magedelight\Customerprice\Block\Adminhtml\Form\Field\Importcategory" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Import</label>
+                    <backend_model>Magedelight\Customerprice\Model\Config\Backend\Importcategory</backend_model>
+                </field>
+            </group>
+
+        </section>
+    </system>
+</config>

@@ -1,0 +1,78 @@
+<?php 
+$customHelper = $this->helper('Magedelight\Customerprice\Helper\Data');
+$customerPriceIsEnabled = $customHelper->getConfig('customerprice/general/enable');
+$_categories = $block->getCategories(); 
+if($customerPriceIsEnabled == 1){
+?>
+<div class="block filter">
+        <div class="content">
+            <strong class="subtitle"><?php /* @escapeNotVerified */ echo __('Shopping Options') ?></strong>
+            <dl class="options" id="narrow-by-list2">
+                <dt class="block-title"><?php /* @escapeNotVerified */ echo __('Category') ?></dt>
+                <dd>
+                    <ol class="items">
+                        <?php foreach ($_categories as $category): 
+                            $_category = $block->getCategory($category->getCategoryId());
+                            ?>
+                            <?php if ($_category->getIsActive()): ?>
+                                <li class="item <?php if($_category->getId() == $this->getRequest()->getParam('catid')){ echo " active"; } ?>">
+                                    <a href="<?php /* @escapeNotVerified */ echo $block->getUrl('priceforcustomer', array('_query'=>array('catid'=>$_category->getId()))); ?>"><?php echo $block->escapeHtml($_category->getName()) ?></a>
+                                    
+                                </li>
+                            <?php endif; ?>
+                        <?php endforeach ?>
+                    </ol>
+                </dd>
+            </dl>
+        </div>
+    </div>
+<?php } ?>
+<style>
+.md-customerprice-index-offers .options ol li a {
+    padding: 10px 12px;
+    border-bottom: #ddd solid 1px;
+    display: block;
+}
+.md-customerprice-index-offers .options ol li a:hover {
+    background: #1979c3;
+    color: #fff;
+}
+.md-customerprice-index-offers .options ol .active {
+    background: #1979c3;
+    
+}
+.md-customerprice-index-offers .options ol .active a {
+    color: #fff;
+}
+.md-customerprice-index-offers .options ol li {
+    font-size: 14px;
+    color: #000;
+    text-decoration: none;
+    margin: 0;
+}
+.md-customerprice-index-offers .options ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+.md-customerprice-index-offers .options ol li a {
+    color: #333;
+    text-decoration: none;
+    font-weight: bold;
+}
+.md-customerprice-index-offers .options .block-title {
+    border-bottom: 1px solid #ccc;
+    background-color: #f4f4f4;
+    color: #636363;
+    text-transform: uppercase;
+    padding: 12px 14px;
+    margin-bottom: 0;
+}
+.md-customerprice-index-offers .options {
+    border: #ddd solid 1px;
+    border-radius: 4px;
+}
+.md-customerprice-index-offers .options dd {
+   margin-bottom: 0px;
+}
+</style>

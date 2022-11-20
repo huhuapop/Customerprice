@@ -1,0 +1,77 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magedelight\Customerprice\Model\Calculation\Calculator\CalculatorInterface" type="Magedelight\Customerprice\Model\Calculation\CalculationService" />
+    <type name="Magento\Catalog\Model\Product\PriceModifier\Composite">
+        <arguments>
+            <argument name="modifiers" xsi:type="array">
+                <item name="ppc_rule" xsi:type="string">Magedelight\Customerprice\Model\Product\PriceModifier</item>
+            </argument>
+        </arguments>
+    </type>
+    <virtualType name="Magento\Catalog\Pricing\Price\Pool" type="Magento\Framework\Pricing\Price\Pool">
+        <arguments>
+            <argument name="prices" xsi:type="array">
+                <item name="ppc_rule_price" xsi:type="string">Magedelight\Customerprice\Pricing\Price\PpcRulePrice</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <virtualType name="Magento\Bundle\Pricing\Price\Pool" type="Magento\Framework\Pricing\Price\Pool">
+        <arguments>
+            <argument name="prices" xsi:type="array">
+                <item name="ppc_rule_price" xsi:type="string">Magedelight\Customerprice\Pricing\Price\PpcRulePrice</item>
+            </argument>
+        </arguments>
+    </virtualType>
+    <type name="Magento\Catalog\Model\Product">
+        <plugin name="Magedelight_after_final_price" type="Magedelight\Customerprice\Plugin\ChangeTierPrice" sortOrder="999" disabled="false"  />
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\FinalPrice">
+        <plugin name="Magedelight_after_final_price_info" type="Magedelight\Customerprice\Plugin\ChangeTierPriceInfo" sortOrder="999" disabled="false"  />
+    </type>
+    <type name="Magento\Framework\Pricing\Adjustment\Collection">
+        <arguments>
+            <argument name="adjustments" xsi:type="array">
+                <item name="pricepercustomer" xsi:type="const">Magedelight\Customerprice\Pricing\Adjustment::ADJUSTMENT_CODE</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Framework\Pricing\Adjustment\Pool">
+        <arguments>
+            <argument name="adjustments" xsi:type="array">
+                <item name="pricepercustomer" xsi:type="array">
+                    <item name="className" xsi:type="string">Magedelight\Customerprice\Pricing\Adjustment</item>
+                    <item name="sortOrder" xsi:type="string">999</item>
+                </item>
+            </argument>
+        </arguments>
+    </type>
+
+    <type name="Magento\Bundle\Pricing\Price\BundleSelectionPrice">
+        <arguments>
+            <argument name="excludeAdjustment" xsi:type="array">
+                <item name="pricepercustomer" xsi:type="const">Magedelight\Customerprice\Pricing\Adjustment::ADJUSTMENT_CODE</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Pricing\Price\CustomOptionPrice">
+        <arguments>
+            <argument name="excludeAdjustment" xsi:type="array">
+                <item name="pricepercustomer" xsi:type="const">Magedelight\Customerprice\Pricing\Adjustment::ADJUSTMENT_CODE</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Catalog\Ui\DataProvider\Product\Listing\Collector\Price">
+        <arguments>
+            <argument name="excludeAdjustments" xsi:type="array">
+                <item name="pricepercustomer" xsi:type="string">pricepercustomer</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="Magento\Bundle\Ui\DataProvider\Product\Listing\Collector\BundlePrice">
+        <arguments>
+            <argument name="excludeAdjustments" xsi:type="array">
+                <item name="pricepercustomer" xsi:type="string">pricepercustomer</item>
+            </argument>
+        </arguments>
+    </type>
+</config>
