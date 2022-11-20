@@ -88,6 +88,9 @@ class CategorySaveAfter implements ObserverInterface
                     }
                 }
             }
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $cacheManager = $objectManager->create('Magento\Framework\App\Cache\Manager');
+            $cacheManager->flush($cacheManager->getAvailableTypes());
         } else {
             $options = $this->request->getPostValue();
             if (isset($options['customeroption'])) {

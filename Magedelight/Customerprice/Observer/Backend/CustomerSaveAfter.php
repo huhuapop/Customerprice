@@ -210,6 +210,10 @@ class CustomerSaveAfter implements ObserverInterface
                     } 
                 }
             }
+
+            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            $cacheManager = $objectManager->create('Magento\Framework\App\Cache\Manager');
+            $cacheManager->flush($cacheManager->getAvailableTypes());
         }
     }
 
