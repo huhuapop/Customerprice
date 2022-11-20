@@ -17,6 +17,7 @@ use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\ObjectManagerInterface;
+use Magedelight\Customerprice\Model\DiscountFactory;
 
 /**
  * Adminhtml sales order create items grid block.
@@ -78,19 +79,39 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
     protected $stockState;
 
     /**
+     * @var \Magento\Framework\Escaper
+     */
+    protected $escaper;
+
+    /**
+     * @var array
+     */
+    protected $websites;
+
+    /**
+     * @var \Magento\Directory\Helper\Data
+     */
+    protected $_directoryHelper;
+
+    /**
+     *
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Backend\Model\Session\Quote    $sessionQuote
-     * @param \Magento\Sales\Model\AdminOrder\Create  $orderCreate
-     * @param PriceCurrencyInterface                  $priceCurrency
+     * @param \Magento\Backend\Model\Session\Quote $sessionQuote
+     * @param \Magento\Sales\Model\AdminOrder\Create $orderCreate
+     * @param PriceCurrencyInterface $priceCurrency
      * @param \Magento\Wishlist\Model\WishlistFactory $wishlistFactory
-     * @param \Magento\GiftMessage\Model\Save         $giftMessageSave
-     * @param \Magento\Tax\Model\Config               $taxConfig
-     * @param \Magento\Tax\Helper\Data                $taxData
-     * @param \Magento\GiftMessage\Helper\Message     $messageHelper
-     * @param StockRegistryInterface                  $stockRegistry
-     * @param StockStateInterface                     $stockState
-     * @param array                                   $data
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @param \Magento\GiftMessage\Model\Save $giftMessageSave
+     * @param \Magento\Tax\Model\Config $taxConfig
+     * @param \Magento\Tax\Helper\Data $taxData
+     * @param \Magento\GiftMessage\Helper\Message $messageHelper
+     * @param StockRegistryInterface $stockRegistry
+     * @param StockStateInterface $stockState
+     * @param ObjectManagerInterface $objectManager
+     * @param \Magedelight\Customerprice\Model\Customerprice $customerprice
+     * @param \Magento\Catalog\Model\Product $product
+     * @param \Magento\Framework\Escaper
+     * @param Discount $discount
+     * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
@@ -105,6 +126,12 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
         StockRegistryInterface $stockRegistry,
         StockStateInterface $stockState,
         ObjectManagerInterface $objectManager,
+        \Magedelight\Customerprice\Model\CustomerpriceFactory $customerprice,
+        \Magento\Catalog\Model\ProductFactory $product,
+        \Magento\Framework\Pricing\Helper\Data $helperdata,
+        \Magento\Framework\Escaper $escaper,
+        DiscountFactory $discount,
+        \Magento\Directory\Helper\Data $_directoryHelper,
         array $data = []
     ) {
         $this->_messageHelper = $messageHelper;
@@ -115,6 +142,12 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
         $this->stockRegistry = $stockRegistry;
         $this->stockState = $stockState;
         $this->_objectManager = $objectManager;
+        $this->customerprice = $customerprice;
+        $this->product = $product;
+        $this->helperdata = $helperdata;
+        $this->discount = $discount;
+        $this->escaper = $escaper;
+        $this->_directoryHelper = $_directoryHelper;
         parent::__construct($context, $sessionQuote, $orderCreate, $priceCurrency, $data);
     }
 
@@ -131,26 +164,27 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
     {
         $customerId = $this->getRequest()->getParam('id');
 
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $optionCollection = $objectManager->create('\Magedelight\Customerprice\Model\Customerprice')
-                ->getCollection()
-                ->addFieldToSelect('*')->addFieldToFilter('customer_id', ['eq' => $customerId])
-                ->setOrder('product_id');
+        //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $optionCollection = $this->customerprice->create()
+                            ->getCollection()
+                            ->addFieldToSelect('*')->addFieldToFilter('customer_id', ['eq' => $customerId])
+                            ->setOrder('product_id');
 
         $finaldata = [];
         $k = 0;
         $productObj = [];
         foreach ($optionCollection as $key => $option) {
             if (!isset($productObj[$option['product_id']])) {
-                $productObj[$option['product_id']] = $objectManager->get('Magento\Catalog\Model\Product')->load(trim($option['product_id']))->getTypeId();
+                $productObj[$option['product_id']] = $this->product->create()->load(trim($option['product_id']))->getTypeId();
             }
             $finaldata[$key]['id'] = $key;
-            $finaldata[$key]['pname'] = htmlspecialchars($option['product_name']);
+            $finaldata[$key]['pname'] = $this->escaper->escapeHtml($option['product_name']);
             $finaldata[$key]['pid'] = $option['product_id'];
             $finaldata[$key]['price'] = $option['price'];
             $finaldata[$key]['newprice'] = $option['log_price'];
             $finaldata[$key]['logprice'] = $option['log_price'];
             $finaldata[$key]['qty'] = $option['qty'];
+            $finaldata[$key]['website'] = $option['website_id'];
             $finaldata[$key]['css_class'] = '';
             $finaldata[$key]['sign'] = '';
             if ($productObj[$option['product_id']] == 'bundle') {
@@ -165,7 +199,8 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
 
     public function getDiscountByCustomerId($customerId)
     {
-        $discount = $this->_objectManager->create('Magedelight\Customerprice\Model\Discount')->getCollection()
+        $discount = $this->discount->create()
+                ->getCollection()
                 ->addFieldToFilter('customer_id', ['eq' => $customerId])
                 ->getFirstItem();
         if ($discount->getId()) {
@@ -173,5 +208,41 @@ class Grid extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractCreate
         } else {
             return;
         }
+    }
+    
+    public function currency($price, $format = true, $includeContainer = true)
+    {
+        $this->helperdata->currency($price, $format, $includeContainer);
+    }
+
+    public function getWebsites()
+    {
+        if ($this->websites !== null) {
+            return $this->websites;
+        }
+
+        $this->websites = [
+            0 => ['name' => __('All Websites'), 'currency' => $this->_directoryHelper->getBaseCurrencyCode()]
+        ];
+
+        /** @var $website \Magento\Store\Model\Website */
+        $allWebsites = $this->_storeManager->getWebsites();
+        foreach ($allWebsites as $website) {
+            $this->websites[$website->getId()] = [
+                'name' => $website->getName(),
+                'currency' => $website->getBaseCurrencyCode()
+            ];
+        }
+        return $this->websites;
+    }
+
+    public function getWebsiteHtml()
+    {
+        $html = '';
+        $allWebsites = $this->getWebsites();
+        foreach ($allWebsites as $key => $value) {
+            $html .= '<option value="'.$key.'">'.$value['name'].' '.$value['currency'].'</option>';
+        }
+        return $html;
     }
 }

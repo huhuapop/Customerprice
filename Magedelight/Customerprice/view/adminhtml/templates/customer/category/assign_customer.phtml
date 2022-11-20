@@ -1,28 +1,31 @@
 <?php
 $blockGrid = $block->getBlockGrid();
 $gridJsObjectName = $blockGrid->getJsObjectName();
+//@codingStandardsIgnoreStart
 ?>
 
 <div class="page-create-order">
     <div>
         <div id="order-search-customer" style="display: none;" class="admin__page-section order-search-items">
             <div class="admin__page-section-title">
-                <span class="title"><?php /* @escapeNotVerified */ echo $block->getHeaderText() ?></span>
+                <span class="title"><?= /* @noEscape */ $block->getHeaderText() ?></span>
                 <?php if ($block->getButtonsHtml()): ?>
-                    <div class="actions"><?php echo $block->getButtonsHtml() ?></div>
+                    <div class="actions"><?= /* @noEscape */ $block->getButtonsHtml() ?></div>
                 <?php endif; ?>
             </div>
-            <?php  echo $block->getGridHtml(); ?>
+            <?= $block->getGridHtml(); ?>
         </div>
         <section id="order-items-customer" class="admin__page-section order-items" data-mage-init='{"loader": {}}'>
             <div class="admin__page-section-title">
-                <strong class="title"><?php /* @escapeNotVerified */ echo $block->getHeaderText() ?></strong>
+                <strong class="title"><?= /* @noEscape */ $block->getHeaderText() ?></strong>
                 <div class="actions">
-                    <button class="action-secondary action-add" id="customer_price_add_category" type="button"><span>Add Customer</span></button> 
+                    <button class="action-secondary action-add" id="customer_price_add_category"
+                            type="button"><span>Add Customer</span>
+                    </button>
 
                 </div>
             </div>
-            <?php echo $block->getBlockForms(); ?>
+            <?= /* @noEscape */ $block->getBlockForms(); ?>
         </section>
     </div>
 </div>
@@ -32,8 +35,8 @@ $gridJsObjectName = $blockGrid->getJsObjectName();
     {
         "*": {
             "Magedelight_Customerprice/customer/assign-customers": {
-                "selectedProducts": <?php /* @escapeNotVerified */ echo $block->getProductsJson(); ?>,
-                "gridJsObjectName": <?php /* @escapeNotVerified */ echo '"' . $gridJsObjectName . '"' ?: '{}'; ?>
+                "selectedProducts": <?= /* @noEscape */ $block->getProductsJson(); ?>,
+                "gridJsObjectName": <?= /* @noEscape */ '"' . $gridJsObjectName . '"' ?: '{}'; ?>
             }
         }
     }
@@ -50,7 +53,7 @@ require(['jquery',
         ], function ($) {
         jQuery = $;    
             jQuery(document).ready(function(){
-                var exits = jQuery.parseJSON('<?php echo $block->getexitsCustomer() ?>');
+                var exits = jQuery.parseJSON('<?= /* @noEscape */ $block->getexitsCustomer() ?>');
                 
                 jQuery('#customer_price_add_category').click(function(){
                     jQuery('#order-search-customer').show();
@@ -70,7 +73,7 @@ require(['jquery',
                             var discount = "";
                             var sign = '';
                             var css_class = 'customs';
-                            var cid = '<?php echo $this->getRequest()->getParam("id") ?>';
+                            var cid = '<?= /* @noEscape */ $block->getRequest()->getParam("id") ?>';
                             var id = 'option_' + itemCount;
                             var item = generateLiTag(pname, pid, discount, sign, css_class, cid, id);
                             jQuery(item).hide().appendTo('#attribute-options-table-category tbody').fadeIn(1000);
@@ -88,7 +91,7 @@ require(['jquery',
                     var categoryVal = jQuery(this).attr('rel');
                     jQuery.ajax({
                         showLoader: true,
-                        url: "<?php echo $block->getUrl('md_customerprice/category/delete'); ?>",
+                        url: "<?= /* @noEscape */ $block->getUrl('md_customerprice/category/delete'); ?>",
                         data: {'id': categoryVal },
                         type: "POST",
                         dataType: 'json'
@@ -106,9 +109,9 @@ require(['jquery',
         function generateLiTag(pname, pid, discount, sign, css_class, cid, id) {
             var randlabelnumber = getRandomInt(1, 100000);
             var item = '<tr class="option-row ' + css_class + '" id = "category-row-'+ pid +'-'+randlabelnumber +'" >' +
-                '<td><span>' + pid + '</span><input data-form-part="category_form" type="hidden" name="customeroption[value][' + id + '][pid]" value="' + pid + '" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-                '<td><span><?php echo "' + pname + '" ?></span><input data-form-part="category_form" type="hidden" name="customeroption[value][' + id + '][pname]" value="' + pname + '" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-                '<td><input data-form-part="category_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required validate-number validate-digits-range digits-range-0-100' + css_class + '" type="text" name="customeroption[value][' + id + '][discount]" value="' + discount + '" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp; <strong>%</strong> &nbsp;' + sign + '<\/td>' + 
+                '<td><span>' + pid + '</span><input data-form-part="category_form" type="hidden" name="customeroption[value][' + id + '][pid]" value="' + pid + '" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+                '<td><span><?= /* @noEscape */ "' + pname + '" ?></span><input data-form-part="category_form" type="hidden" name="customeroption[value][' + id + '][pname]" value="' + pname + '" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+                '<td><input data-form-part="category_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required validate-number validate-digits-range digits-range-0-100' + css_class + '" type="text" name="customeroption[value][' + id + '][discount]" value="' + discount + '" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp; <strong>%</strong> &nbsp;' + sign + '<\/td>' + 
                 '<td id="delete_button_container_' + id + '">' +
                 '<input data-form-part="category_form" type="hidden" class="delete-flag" name="customeroption[value][' + id + '][cid]" value="' + cid + '" />' +
                 '<button class="delete-option category-customer-unsaved" rel="category-row-'+ pid +'-'+randlabelnumber +'" type="button"><span>Remove Category</span><\/button>' +

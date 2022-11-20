@@ -88,7 +88,10 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         try {
             $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $uploader = $this->_objectManager->create('Magento\MediaStorage\Model\File\Uploader', ['fileId' => 'customerpriceimport']);
+            $uploader = $this->_objectManager->create(
+                \Magento\MediaStorage\Model\File\Uploader::class,
+                ['fileId' => 'customerpriceimport']
+            );
         } catch (\Exception $e) {
             if ($e->getCode() == '666') {
                 return $this;
@@ -112,7 +115,8 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $headers = $stream->readCsv();
         if ($headers === false || count($headers) < 1) {
             $stream->close();
-            throw new \Magento\Framework\Exception\LocalizedException(__('Please correct Price Per Customer File Format.'));
+            throw new
+            \Magento\Framework\Exception\LocalizedException(__('Please correct Price Per Customer File Format.'));
         }
 
         $connection = $this->getConnection();
@@ -129,14 +133,15 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
                     continue;
                 }
 
-                $row = $this->_getImportRow($csvLine, $rowNumber, $headers);
+                $row = $this->_getImportRow($csvLine, $headers, $rowNumber);
                 $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-                $priceperCustomer = $objectManager->create('Magedelight\Customerprice\Model\Customerprice');
+                $priceperCustomer = $objectManager->create(\Magedelight\Customerprice\Model\Customerprice::class);
                 $ppc = $priceperCustomer->getCollection()
                     ->addFieldToFilter('customer_id', $row['customer_id'])
                     ->addFieldToFilter('product_id', $row['product_id'])
                     ->addFieldToFilter('qty', $row['qty'])
+                    ->addFieldToFilter('website_id', $row['website_id'])
                     ->getFirstItem();
 
                 if ($ppc->hasData('customerprice_id')) {
@@ -145,11 +150,10 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
                 if ($row !== false && $row['product_id'] > 0 && $row['customer_id'] > 0) {
                     $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
 
-                    $priceCustomer = $objectManager->create('Magedelight\Customerprice\Model\Customerprice');
+                    $priceCustomer = $objectManager->create(\Magedelight\Customerprice\Model\Customerprice::class);
                     $priceCustomer->setData($row)->save();
                 }
             }
-            
 
             $stream->close();
         } catch (\Magento\Framework\Exception\LocalizedException $e) {
@@ -178,7 +182,7 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         return $this;
     }
 
-    protected function _getImportRow($row, $rowNumber = 0, $headers)
+    protected function _getImportRow($row, $headers, $rowNumber = 0)
     {
         if (count($row) < 4) {
             $this->_importErrors[] = __('Please correct Table Rates format in the Row #%1.', $rowNumber);
@@ -189,20 +193,21 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $skuKey = array_search('sku', $headers);
         $qtyKey = array_search('qty', $headers);
         $priceKey = array_search('price', $headers);
-        $websiteKey = array_search('website', $headers);
+        $websiteKey = array_search('website_id', $headers);
         // strip whitespace from the beginning and end of each row
         foreach ($row as $k => $v) {
             $row[$k] = trim($v);
         }
-
-        $email = $row[$emailKey];
-        $sku = $row[$skuKey];
-        $qty = $row[$qtyKey];
+        $email = $row[0];
+        $sku = $row[1];
+        $qty = $row[2];
+        $website_id = 1;
         if ($websiteKey) {
-            $website_id = $row[$websiteKey];
+            $website_id = $row[4];
         }
-        $newprice = $row[$priceKey];
-        $logprice = $row[$priceKey];
+        
+        $newprice = $row[3];
+        $logprice = $row[3];
         if (!is_numeric($qty)) {
             $this->_importErrors[] = __('Invalid Qty Price "%1" in the Row #%2.', $row[$qtyKey], $rowNumber);
 
@@ -222,26 +227,29 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 
                 return false;
             } elseif (is_numeric($matches[1]) && ($matches[1] <= 0 || $matches[1] > 100)) {
-                $this->_importErrors[] = __('Invalid New Price "%1" in the Row #%2.Percentage should be greater than 0 and less or equals than 100.', $row[$priceKey], $rowNumber);
+                $this->_importErrors[] = __(
+                    'Invalid New Price "%1" in the Row #%
+                2.Percentage should be greater than 0 and less or equals than 100.',
+                    $row[$priceKey],
+                    $rowNumber
+                );
 
                 return false;
             }
         }
-
         if (!preg_match("/([\w\-]+\@[\w\-]+\.[\w\-]+)/", $email)) {
-            $this->_importErrors[] = __('Invalid email "%1" in the Row #%2.', $row[$emailKey], $rowNumber);
+            $this->_importErrors[] = __('Invalid email "%1" in the Row #%2.', $row[0], $rowNumber);
 
             return false;
         }
-
-        if ($websiteKey) {
+        if (!empty($website_id)) {
             $customer = $this->_customerFactory->create()->getCollection()
                     ->addNameToSelect()
                     ->addAttributeToSelect('entity_id')
                     ->addAttributeToSelect('email')
                     ->addAttributeToSelect('group_id')
                     ->addFieldToFilter('email', $email)
-                    ->addFieldToFilter('website_id', $website_id)
+                    //->addFieldToFilter('website_id', $website_id)
                     ->getFirstItem();
         } else {
             $customer = $this->_customerFactory->create()->getCollection()
@@ -255,18 +263,19 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $customerId = $customer->getId();
 
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $product = $objectManager->get('Magento\Catalog\Model\Product')->loadByAttribute('sku', $sku);
-        //var_dump($product); exit;
+        $product = $objectManager->get(\Magento\Catalog\Model\Product::class)->
+        loadByAttribute('sku', $sku);
         if (!$product) {
             $this->_importErrors[] = __('%1 Products are not allowed in the row #%2.', ucfirst($sku), $rowNumber);
             return false;
         }
-        if ($product->getTypeId() == 'grouped' || $product->getTypeId() == 'bundle' || $product->getTypeId() == 'configurable') {
-            $this->_importErrors[] = __('%1 Products are not allowed in the row #%2.', ucfirst($product->getTypeId()), $rowNumber);
-
+        if ($product->getTypeId() == 'grouped' ||
+            $product->getTypeId() == 'bundle' ||
+            $product->getTypeId() == 'configurable') {
+            $this->_importErrors[] = __('%1 Products are not allowed in the row #%
+            2.', ucfirst($product->getTypeId()), $rowNumber);
             return false;
         }
-        
 
         $productName = $product->getName();
         $productId = $product->getId();
@@ -276,7 +285,12 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
                 $newprice = $product->getPrice() - ($product->getPrice() * ($matches[1] / 100));
             } else {
                 if ($matches[1] < 0 || $matches[1] > 100) {
-                    $this->_importErrors[] = __('Invalid New Price "%1" in the row #%2.Percentage should be greater than 0 and less or equals than 100.', $newprice, $rowNumber);
+                    $this->_importErrors[] = __(
+                        'Invalid New Price "%1" in the row #%
+                    2.Percentage should be greater than 0 and less or equals than 100.',
+                        $newprice,
+                        $rowNumber
+                    );
 
                     return false;
                 } else {
@@ -286,7 +300,12 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         } else {
             if ($product->getTypeId() == 'bundle') {
                 if ($newprice < 0 || $newprice > 100) {
-                    $this->_importErrors[] = __('Invalid New Price "%1" in the row #%2.Percentage should be greater than 0 and less or equals than 100.', $newprice, $rowNumber);
+                    $this->_importErrors[] = __(
+                        'Invalid New Price "%1" in the row #%
+                    2.Percentage should be greater than 0 and less or equals than 100.',
+                        $newprice,
+                        $rowNumber
+                    );
 
                     return false;
                 }
@@ -303,6 +322,7 @@ class Customerprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             'log_price' => ($product->getTypeId() != 'bundle') ? $logprice : str_replace('%', '', $logprice),
             'new_price' => ($product->getTypeId() != 'bundle') ? $newprice : str_replace('%', '', $newprice), // New price for customer
             'qty' => $qty,           // Qty
+            'website_id' => $website_id
         ];
     }
 }

@@ -19,7 +19,6 @@ class Categoryprice extends \Magento\Framework\View\Element\Template
      * @var \Magento\Customer\Model\Session
      */
     protected $customerSession;
-    
 
     /**
      * @param \Magento\Catalog\Block\Product\Context             $context
@@ -32,19 +31,21 @@ class Categoryprice extends \Magento\Framework\View\Element\Template
         \Magento\Catalog\Block\Product\Context $context,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Catalog\Model\CategoryFactory $categoryFactory,
-        \Magedelight\Customerprice\Model\Categoryprice $categoryprice,
+        \Magedelight\Customerprice\Model\CategorypriceFactory $categoryprice,
+        \Magedelight\Customerprice\Helper\Data $helper,
         array $data = []
     ) {
         $this->customerSession = $customerSession;
         $this->categoryFactory = $categoryFactory;
         $this->categoryprice = $categoryprice;
+        $this->helper = $helper;
         parent::__construct($context, $data);
     }
 
     public function getCategories()
     {
         $customerId = $this->customerSession->getId();
-        $collections = $this->categoryprice->getCollection()
+        $collections = $this->categoryprice->create()->getCollection()
                 ->addFieldToSelect('*')->addFieldToFilter('customer_id', ['eq' => $customerId]);
         return $collections;
     }
@@ -53,5 +54,13 @@ class Categoryprice extends \Magento\Framework\View\Element\Template
         $customerId = $this->customerSession->getId();
         $category = $this->categoryFactory->create()->load($catId);
         return $category;
+    }
+
+    public function getmoduleStatus()
+    {
+        if ($this->helper->isEnabled()) {
+            return true;
+        }
+        return false;
     }
 }

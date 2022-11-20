@@ -40,7 +40,9 @@ class Import extends \Magento\Framework\Data\Form\Element\AbstractElement
         $html .= '<input id="time_condition" type="hidden" name="'.$this->getName().'" value="'.time().'" />';
 
         //$html .= parent::getElementHtml();
-        $html .= '<input id="customerprice_sample_import" name="customerpriceimport" data-ui-id="file-groups-sample-fields-import-value" value="" class="" type="file" />';
+        $html .= '<input id="customerprice_sample_import"
+                  name="customerpriceimport" data-ui-id="file-groups-sample-fields-import-value"
+                  value="" class="" type="file" />';
 
         return $html;
     }

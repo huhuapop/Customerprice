@@ -43,6 +43,8 @@ class AssignCustomer extends \Magento\Backend\Block\Template
      * @param \Magento\Backend\Block\Template\Context $context
      * @param \Magento\Framework\Registry $registry
      * @param \Magento\Framework\Json\EncoderInterface $jsonEncoder
+     * @param \Magedelight\Customerprice\Model\ResourceModel\Categoryprice\CollectionFactory $categorypriceFactory
+     * @param \Magento\Customer\Model\Customer $customer
      * @param array $data
      */
     public function __construct(
@@ -50,11 +52,13 @@ class AssignCustomer extends \Magento\Backend\Block\Template
         \Magento\Framework\Registry $registry,
         \Magento\Framework\Json\EncoderInterface $jsonEncoder,
         \Magedelight\Customerprice\Model\ResourceModel\Categoryprice\CollectionFactory $categorypriceFactory,
+        \Magento\Customer\Model\CustomerFactory $customer,
         array $data = []
     ) {
         $this->registry = $registry;
         $this->jsonEncoder = $jsonEncoder;
         $this->_categorypriceFactory = $categorypriceFactory;
+        $this->customer = $customer;
         parent::__construct($context, $data);
     }
 
@@ -68,7 +72,7 @@ class AssignCustomer extends \Magento\Backend\Block\Template
     {
         if (null === $this->blockGrid) {
             $this->blockGrid = $this->getLayout()->createBlock(
-                'Magedelight\Customerprice\Block\Adminhtml\Category\Tab\Customer',
+                \Magedelight\Customerprice\Block\Adminhtml\Category\Tab\Customer::class,
                 'category.customer.grid'
             );
         }
@@ -131,7 +135,7 @@ class AssignCustomer extends \Magento\Backend\Block\Template
         ];
 
         return $this->getLayout()->createBlock(
-            'Magento\Backend\Block\Widget\Button'
+            \Magento\Backend\Block\Widget\Button::class
         )->setData(
             $addButtonData
         )->toHtml();
@@ -141,7 +145,7 @@ class AssignCustomer extends \Magento\Backend\Block\Template
     {
         if (null === $this->blockFormdetails) {
             $this->blockFormdetails = $this->getLayout()->createBlock(
-                'Magedelight\Customerprice\Block\Adminhtml\Category\Tab\GridCustomer',
+                \Magedelight\Customerprice\Block\Adminhtml\Category\Tab\GridCustomer::class,
                 'category.customer.gridcategory'
             )->setTemplate('customer/category/gridcategory.phtml');
         }
@@ -149,8 +153,8 @@ class AssignCustomer extends \Magento\Backend\Block\Template
     }
     public function getCustomerName($custId)
     {
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $customer = $objectManager->create('Magento\Customer\Model\Customer')->load($custId);
+        //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $customer = $this->customer->create()->load($custId);
         return $customer->getName();
     }
     public function getexitsCustomer()

@@ -53,7 +53,7 @@ class SearchCategory extends \Magento\Sales\Block\Adminhtml\Order\Create\Abstrac
         ];
 
         return $this->getLayout()->createBlock(
-            'Magento\Backend\Block\Widget\Button'
+            \Magento\Backend\Block\Widget\Button::class
         )->setData(
             $addButtonData
         )->toHtml();

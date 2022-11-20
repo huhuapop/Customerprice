@@ -42,7 +42,6 @@ class Customer extends \Magento\Backend\Block\Widget\Grid\Extended
     
     protected $_categorypriceFactory;
 
-
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
         \Magento\Backend\Helper\Data $backendHelper,
@@ -139,7 +138,7 @@ class Customer extends \Magento\Backend\Block\Widget\Grid\Extended
                     'name' => 'in_category',
                     'values' => $this->_getSelectedCustomer(),
                     'index' => 'entity_id',
-                    'renderer'=> '\Magedelight\Customerprice\Block\Adminhtml\Category\Tab\Renderer\Renderer',
+                    'renderer'=> \Magedelight\Customerprice\Block\Adminhtml\Category\Tab\Renderer\Renderer::class,
                     'header_css_class' => 'col-select col-massaction',
                     'column_css_class' => 'col-select col-massaction'
                 ]

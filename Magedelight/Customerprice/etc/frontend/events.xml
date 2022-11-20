@@ -4,7 +4,20 @@
     <event name='catalog_product_get_final_price'>
         <observer name='Magedelight\Customerprice\Observer\ProcessFinalPrice' instance='Magedelight\Customerprice\Observer\ProcessFinalPrice'/>
     </event>
-    <!-- <event name='catalog_product_collection_load_after'>
+    <event name='catalog_product_collection_load_after'>
         <observer name='Magedelight\Customerprice\Observer\ModifyPricesListing' instance='Magedelight\Customerprice\Observer\ModifyPricesListing'/>
+        <observer name='rc' instance='Magedelight\Customerprice\Observer\RefreshCache'/>
+    </event>
+    <!-- <event name="checkout_cart_product_add_after">
+        <observer name="set_custom_price_after_add_to_cart" instance="Magedelight\Customerprice\Observer\CustomPriceForItem" />
+    </event>
+    <event name="checkout_cart_update_items_after">
+		<observer name="salesquotemergecolumn" instance="Magedelight\Customerprice\Observer\SalesQuoteMergeAfter"/>
+	</event>
+    <event name="sales_quote_item_qty_set_after">
+        <observer name="quote_item_observer" instance="Magedelight\Customerprice\Observer\CustomerLogin" />
     </event> -->
+    <event name="customer_login">
+        <observer name="customer_login_observer" instance="Magedelight\Customerprice\Observer\RefreshCache"/>
+    </event>
 </config>

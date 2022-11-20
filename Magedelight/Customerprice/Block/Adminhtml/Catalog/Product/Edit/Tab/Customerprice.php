@@ -24,8 +24,10 @@ class Customerprice extends \Magento\Backend\Block\Widget implements \Magento\Ba
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
+        \Magento\Catalog\Model\ProductFactory $productmodel,
         array $data = []
     ) {
+        $this->productmodel = $productmodel;
         parent::__construct($context, $data);
     }
 
@@ -48,7 +50,7 @@ class Customerprice extends \Magento\Backend\Block\Widget implements \Magento\Ba
     {
         $storeId = $this->getRequest()->getParam('store');
 
-        return intval($storeId);
+        return (int)($storeId);
     }
 
     /**
@@ -75,9 +77,10 @@ class Customerprice extends \Magento\Backend\Block\Widget implements \Magento\Ba
     public function canShowTab()
     {
         $id = $this->getRequest()->getParam('id');
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $product = $objectManager->get('Magento\Catalog\Model\Product')->load($id);
-        if ($product->getTypeId() == 'simple' || $product->getTypeId() == 'downloadable' || $product->getTypeId() == 'virtual') {
+        //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+        $product = $this->productmodel->create()->load($id);
+        if ($product->getTypeId() == 'simple' || $product->getTypeId() == 'downloadable'
+            || $product->getTypeId() == 'virtual') {
             return true;
         } else {
             return false;

@@ -83,16 +83,16 @@ class Export extends \Magento\Config\Controller\Adminhtml\System\AbstractConfig
      */
     public function execute()
     {
-        $fileName = 'pricepercustomer.csv';
-        $content = '';
+        $fileNames = 'pricepercustomer.csv';
+        $contents = '';
         $_columns = [
-            'email', 'sku', 'qty', 'price', 'website',
+            'email', 'sku', 'qty', 'price', 'website_id',
         ];
         $data = [];
         foreach ($_columns as $column) {
             $data[] = '"'.$column.'"';
         }
-        $content .= implode(',', $data)."\n";
+        $contents .= implode(',', $data)."\n";
         
         $pricePerCustomer = $this->customerPrice->getCollection();
         foreach ($pricePerCustomer as $_pricePerCustomer) {
@@ -105,10 +105,11 @@ class Export extends \Magento\Config\Controller\Adminhtml\System\AbstractConfig
             $data[] = trim($_pricePerCustomer->getQty());
             $data[] = trim($_pricePerCustomer->getLogPrice());
             $data[] = trim($customer->getWebsiteId());
+            $data[] = trim($_pricePerCustomer->getWebsiteId());
 
-            $content .= implode(',', $data)."\n";
+            $contents .= implode(',', $data)."\n";
         }
 
-        return $this->fileFactory->create($fileName, $content, DirectoryList::VAR_DIR);
+        return $this->fileFactory->create($fileNames, $contents, DirectoryList::VAR_DIR);
     }
 }

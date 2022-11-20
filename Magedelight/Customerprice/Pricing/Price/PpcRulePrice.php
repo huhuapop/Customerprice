@@ -84,7 +84,8 @@ class PpcRulePrice extends AbstractPrice implements BasePriceProviderInterface
                 if ($this->product->hasData(self::PRICE_CODE)) {
                     $this->value = (float)$this->product->getData(self::PRICE_CODE) ?: false;
                 } else {
-                    $this->value = $this->calculatorInterface->calculate($this->product->getData('price'), $this->product);
+                    $this->value = $this->calculatorInterface->
+                    calculate($this->product->getData('price'), $this->product);
                     $this->value = $this->value ? (float)$this->value : false;
                 }
                 if ($this->value) {

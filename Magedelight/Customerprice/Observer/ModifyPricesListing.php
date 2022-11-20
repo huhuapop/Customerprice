@@ -71,10 +71,12 @@ class ModifyPricesListing implements ObserverInterface
             $customerId = $this->customerSession->create()->getCustomer()->getId();
         }
         if ($customerId) {
+            $websiteId = $this->getCurrentWebsiteId();
             $tierPriceCollection = $this->customerPrice->getCollection()
                     ->addFieldToSelect('*')
                     ->addFieldToFilter('product_id', ['eq' => $product->getId()])
-                    ->addFieldToFilter('customer_id', ['eq' => $customerId]);
+                    ->addFieldToFilter('customer_id', ['eq' => $customerId])
+                    ->addFieldToFilter('website_id', ['in' => array(0,$websiteId)]);
             if ($tierPriceCollection->getSize()) {
                 $newTierPrice = $tierPriceCollection->getData();
                 if ($this->state->getAreaCode() == 'adminhtml') {
@@ -82,9 +84,10 @@ class ModifyPricesListing implements ObserverInterface
                 } else {
                     $groupId = $this->customerSession->create()->getCustomerGroupId();
                 }
-                $websiteId = $this->getCurrentWebsiteId();
+                //$websiteId = $this->getCurrentWebsiteId();
                 foreach ($newTierPrice as $price) {
-                    $res['website_id'] = $websiteId;
+                    //$res['website_id'] = $websiteId;
+                    $res['website_id'] = $price['website_id'];
                     $res['all_groups'] = 0;
                     $res['cust_group'] = $groupId;
                     $res['price'] = (float)$price['new_price'];

@@ -2,6 +2,10 @@
 namespace Magedelight\Customerprice\Model\ResourceModel\Layer\Filter;
 
 use Magento\Framework\App\Http\Context;
+use Magento\Framework\Indexer\DimensionFactory;
+use Magento\Framework\Search\Request\IndexScopeResolverInterface;
+
+// phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
 
 class Price extends \Magento\Catalog\Model\ResourceModel\Layer\Filter\Price
 {
@@ -11,8 +15,21 @@ class Price extends \Magento\Catalog\Model\ResourceModel\Layer\Filter\Price
         \Magedelight\Customerprice\Model\Layer\Resolver $layerResolver,
         \Magento\Customer\Model\Session $session,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
-        $connectionName = null
+        $connectionName = null,
+        IndexScopeResolverInterface $priceTableResolver = null,
+        Context $httpContext = null,
+        DimensionFactory $dimensionFactory = null
     ) {
-        parent::__construct($context, $eventManager, $layerResolver, $session, $storeManager, $connectionName);
+        parent::__construct(
+            $context,
+            $eventManager,
+            $layerResolver,
+            $session,
+            $storeManager,
+            $connectionName,
+            $priceTableResolver,
+            $httpContext,
+            $dimensionFactory
+        );
     }
 }

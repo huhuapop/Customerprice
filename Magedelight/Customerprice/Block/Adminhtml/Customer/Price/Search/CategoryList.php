@@ -28,7 +28,16 @@ class CategoryList extends \Magento\Catalog\Block\Adminhtml\Category\Tree
     ) {
     
         $this->_buttonList = $buttonList;
-        parent::__construct($context, $categoryTree, $registry, $categoryFactory, $jsonEncoder, $resourceHelper, $backendSession, $data);
+        parent::__construct(
+            $context,
+            $categoryTree,
+            $registry,
+            $categoryFactory,
+            $jsonEncoder,
+            $resourceHelper,
+            $backendSession,
+            $data
+        );
     }
 
     public function getFrontUrl($storeId = null)

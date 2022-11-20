@@ -19,6 +19,9 @@ class Save extends \Magento\Framework\App\Action\Action
     protected $resultPageFactory;
     protected $_customerFactory;
     protected $resultJsonFactory;
+    protected $discountFactory;
+    protected $customerPriceFactory;
+    protected $productFactory;
 
     /**
      * @param \Magento\Framework\App\Action\Context            $context
@@ -32,12 +35,18 @@ class Save extends \Magento\Framework\App\Action\Action
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
+        \Magedelight\Customerprice\Model\DiscountFactory $discountFactory,
+        \Magedelight\Customerprice\Model\CustomerpriceFactory $customerPriceFactory,
+        \Magento\Catalog\Model\ProductFactory $productFactory,
         \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
     ) {
         $this->_customerSession = $customerSession;
         $this->resultPageFactory = $resultPageFactory;
         $this->_customerFactory = $customerFactory;
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->discountFactory = $discountFactory;
+        $this->customerPriceFactory = $customerPriceFactory;
+        $this->productFactory = $productFactory;
         parent::__construct($context);
     }
 
@@ -66,7 +75,8 @@ class Save extends \Magento\Framework\App\Action\Action
             }
         } else {
             if (is_numeric($discountValue['discount'])) {
-                $discountModel = $this->_objectManager->create('Magedelight\Customerprice\Model\Discount')
+                //$discountModel = $this->_objectManager->create('Magedelight\Customerprice\Model\Discount')
+                $discountModel = $this->discountFactory->create()
                         ->setData(['customer_id' => $customer_id, 'value' => $discountValue['discount']]);
                 try {
                     $discountModel->save();
@@ -81,7 +91,8 @@ class Save extends \Magento\Framework\App\Action\Action
                 if ($key == 'value') {
                     /* ---Delete--- */
                     if ($value['del'] == 1 && is_int($k)) {
-                        $priceCustomerDel = $this->_objectManager->create('Magedelight\Customerprice\Model\Customerprice')
+                       // $priceCustomerDel = $this->_objectManager->create('Magedelight\Customerprice\Model\Customerprice')
+                        $priceCustomerDel = $this->customerPriceFactory->create()
                                 ->load($k)
                                 ->delete();
                         unset($_options[$k]);
@@ -90,7 +101,9 @@ class Save extends \Magento\Framework\App\Action\Action
                     }
 
                     /* ---Insert---- */
-                    $priceCustomer = $this->_objectManager->create('Magedelight\Customerprice\Model\Customerprice');
+                    //$priceCustomer = $this->_objectManager->create('Magedelight\Customerprice\Model\Customerprice');
+
+                    $priceCustomer = $this->customerPriceFactory->create();
 
                     if (is_int($k)) {
                         $priceCustomer->setId($k);
@@ -98,8 +111,10 @@ class Save extends \Magento\Framework\App\Action\Action
                     //die($value['cid']);
                     $newPrice = $value['newprice'];
 
-                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                    $product = $objectManager->get('Magento\Catalog\Model\Product')->load(trim($value['pid']));
+                    //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    //$product = $objectManager->get('Magento\Catalog\Model\Product')->load(trim($value['pid']));
+
+                    $product = $this->productFactory->create()->load(trim($value['pid']));
 
                     $customer = $this->_customerFactory->create()->load($value['cid']);
 
@@ -150,7 +165,9 @@ class Save extends \Magento\Framework\App\Action\Action
 
     public function getDiscountByCustomerId($customerId)
     {
-        $discount = $this->_objectManager->create('Magedelight\Customerprice\Model\Discount')->getCollection()
+        //$discount = $this->_objectManager->create('Magedelight\Customerprice\Model\Discount')->getCollection()
+        $discount = $this->discountFactory->create()
+                ->getCollection()
                 ->addFieldToFilter('customer_id', ['eq' => $customerId])
                 ->getFirstItem();
         if ($discount->getId()) {
@@ -169,8 +186,9 @@ class Save extends \Magento\Framework\App\Action\Action
     {
         $finaldata = [];
         if ($customerId) {
-            $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $optionCollection = $objectManager->create('\Magedelight\Customerprice\Model\Customerprice')
+            //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+            //$optionCollection = $objectManager->create('\Magedelight\Customerprice\Model\Customerprice')
+            $optionCollection = $this->customerPriceFactory->create()
                     ->getCollection()
                     ->addFieldToSelect('*')->addFieldToFilter('customer_id', ['eq' => $customerId])
                     ->setOrder('product_id');
@@ -181,7 +199,9 @@ class Save extends \Magento\Framework\App\Action\Action
             $productObj = [];
             foreach ($optionCollection as $key => $option) {
                 if (!isset($productObj[$option['product_id']])) {
-                    $productObj[$option['product_id']] = $objectManager->get('Magento\Catalog\Model\Product')->load(trim($option['product_id']))->getTypeId();
+                    //$productObj[$option['product_id']] = $objectManager->get('Magento\Catalog\Model\Product')->load(trim($option['product_id']))->getTypeId();
+                    $productObj[$option['product_id']] = $this->productFactory->create()
+                        ->load(trim($option['product_id']))->getTypeId();
                 }
                 //$rowObj = new Varien_Object();
                 $finaldata[$key]['id'] = $key;

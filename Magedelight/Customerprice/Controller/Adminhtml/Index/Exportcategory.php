@@ -83,13 +83,13 @@ class Exportcategory extends \Magento\Config\Controller\Adminhtml\System\Abstrac
      */
     public function execute()
     {
-        $fileName = 'pricepercategory.csv';
+        $fileNamePass = 'pricepercategory.csv';
         $content = '';
-        $_columns = [
+        $_columnsPass = [
             'customer_email', 'category_id', 'discount', 'website',
         ];
         $data = [];
-        foreach ($_columns as $column) {
+        foreach ($_columnsPass as $column) {
             $data[] = '"'.$column.'"';
         }
         $content .= implode(',', $data)."\n";
@@ -109,6 +109,6 @@ class Exportcategory extends \Magento\Config\Controller\Adminhtml\System\Abstrac
             $content .= implode(',', $data)."\n";
         }
 
-        return $this->fileFactory->create($fileName, $content, DirectoryList::VAR_DIR);
+        return $this->fileFactory->create($fileNamePass, $content, DirectoryList::VAR_DIR);
     }
 }

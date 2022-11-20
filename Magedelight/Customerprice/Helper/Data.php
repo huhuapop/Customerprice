@@ -91,42 +91,6 @@ class Data extends \Magento\Framework\App\Helper\AbstractHelper
 
         return $this->scopeConfig->getValue(self::XML_PATH_ADVANCED_ENABLED, $storeScope);
     }
-    
-    public function getDomainName($domain)
-    {
-        $string = '';
-        
-        $withTrim = str_replace(["www.","http://","https://"], '', $domain);
-        
-        /* finding the first position of the slash  */
-        $string = $withTrim;
-        
-        $slashPos = strpos($withTrim, "/", 0);
-        
-        if ($slashPos != false) {
-            $parts = explode("/", $withTrim);
-            $string = $parts[0];
-        }
-        return $string;
-    }
-
-    public function getWebsites()
-    {
-        $websites = $this->_storeManager->getWebsites();
-        $websiteUrls = [];
-        foreach ($websites as $website) {
-            foreach ($website->getStores() as $store) {
-                $wedsiteId = $website->getId();
-                $storeObj = $this->_storeManager->getStore($store);
-                $storeId = $storeObj->getId();
-                $url = $storeObj->getBaseUrl(\Magento\Framework\UrlInterface::URL_TYPE_WEB);
-                $parsedUrl = parse_url($url);
-                $websiteUrls[] = str_replace(['www.', 'http://', 'https://'], '', $parsedUrl['host']);
-            }
-        }
-
-        return $websiteUrls;
-    }
 
     public function getConfig($config_path)
     {

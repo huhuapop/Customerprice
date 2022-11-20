@@ -1,4 +1,4 @@
-<?php 
+<?php
 /**
  * Magedelight
  * Copyright (C) 2014  Magedelight <info@Magedelight.com>
@@ -25,11 +25,10 @@
  * @author     Magedelight <info@Magedelight.com>
  */
 ?>
-
 <div id="catalogprint.sidebar">
     <div class="entry-edit">
         <div class="entry-edit-head">
-            <h4><?php echo __('Category Selection') ?></h4>
+            <h4><?= /* @noEscape */ __('Category Selection') ?></h4>
         </div>
         <div class="fieldset">
             <div class="hor-scroll">
@@ -53,7 +52,7 @@
 ], function(jQuery){
     jQuery(document).ready(function(){
         var categoryLoader = new Ext.tree.TreeLoader({
-            dataUrl: '<?php echo $this->getLoadTreeUrl() ?>'
+            dataUrl: '<?= /* @noEscape */ $block->getLoadTreeUrl() ?>'
         });
         categoryLoader.createNode = function(config) {
         config.uiProvider = Ext.tree.CheckboxNodeUI;
@@ -97,15 +96,15 @@
         varienElementMethods.setHasChanges(node.getUI().checkbox);
     }, tree);
         var root = new Ext.tree.TreeNode({
-        text: '<?php echo htmlentities($block->getRoot()->getName()) ?>',
+        text: '<?= /* @noEscape */ htmlentities($block->getRoot()->getName()) ?>',
         draggable:false,
-        checked:'<?php echo $block->getRoot()->getChecked() ?>',
-        id:'<?php echo $block->getRoot()->getId() ?>',
-        disabled: <?php echo ($block->getRoot()->getDisabled() ? 'true' : 'false') ?>,
+        checked:'<?= /* @noEscape */ $block->getRoot()->getChecked() ?>',
+        id:'<?= /* @noEscape */ $block->getRoot()->getId() ?>',
+        disabled: <?= /* @noEscape */ ($block->getRoot()->getDisabled() ? 'true' : 'false') ?>,
         uiProvider: Ext.tree.CheckboxNodeUI
     });
     tree.setRootNode(root);
-    bildCategoryTree(root, <?php echo $this->getTreeJson() ?>);
+    bildCategoryTree(root, <?= /* @noEscape */ $block->getTreeJson() ?>);
     tree.addListener('click', categoryClick.createDelegate(this));
 
     // render the tree

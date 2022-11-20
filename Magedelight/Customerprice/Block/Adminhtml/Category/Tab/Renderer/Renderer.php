@@ -13,6 +13,7 @@ class Renderer extends \Magento\Backend\Block\Widget\Grid\Column\Renderer\Abstra
      * @param \Magento\Backend\Block\Context $context
      * @param Action\UrlBuilder $actionUrlBuilder
      * @param array $data
+     * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
      */
     public function __construct(
         \Magento\Backend\Block\Context $context,
@@ -29,6 +30,8 @@ class Renderer extends \Magento\Backend\Block\Widget\Grid\Column\Renderer\Abstra
      */
     public function render(\Magento\Framework\DataObject $row)
     {
-        return '<input class="checkbox customercustom" type="checkbox" relcust="'.$row->getEmail().'"  rel="'.$row->getName().'" value = '.$row->getId().'>';
+        return '<input class="checkbox customercustom"
+         type="checkbox" relcust="'.$row->getEmail().'"
+         rel="'.$row->getName().'" value = '.$row->getId().'>';
     }
 }

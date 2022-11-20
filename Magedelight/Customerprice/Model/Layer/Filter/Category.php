@@ -70,8 +70,7 @@ class Category extends \Magento\CatalogSearch\Model\Layer\Filter\Category
     {
         /** @var \Magento\CatalogSearch\Model\ResourceModel\Fulltext\Collection $productCollection */
         $productCollection = $this->getLayer()->getProductCollection();
-
-        $optionsFacetedData = '' ;// $productCollection->getFacetedData('category');
+        $optionsFacetedData = '' ;
         $category = $this->dataProvider->getCategory();
         $categories = $category->getChildrenCategories();
 

@@ -77,6 +77,7 @@ class ItemsCategory extends \Magento\Sales\Block\Adminhtml\Order\Create\Abstract
      * Return HTML code of the block.
      *
      * @return string
+     * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
      */
     protected function _toHtml()
     {
@@ -87,7 +88,7 @@ class ItemsCategory extends \Magento\Sales\Block\Adminhtml\Order\Create\Abstract
     {
         $customerId = $this->getRequest()->getParam('id');
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $optionCollection = $objectManager->create('\Magedelight\Customerprice\Model\Categoryprice')
+        $optionCollection = $objectManager->create(\Magedelight\Customerprice\Model\Categoryprice::class)
                 ->getCollection()
                 ->addFieldToSelect('*')->addFieldToFilter('customer_id', ['eq' => $customerId])
                 ->setOrder('category_id');

@@ -29,15 +29,7 @@
                 <action method="setToolbarBlockName">
                     <argument name="name" xsi:type="string">product_list_toolbar</argument>
                 </action>
-        </block>
-        
-    </referenceContainer>    
-        
-    <referenceContainer name="sidebar.main">
-        <block class="Magedelight\Customerprice\Block\Navigation\Mdnavigation" name="md.leftnav" before="-" template="Magento_LayeredNavigation::layer/view.phtml">
-            <block class="Magento\LayeredNavigation\Block\Navigation\State" name="catalog.navigation.state" as="state" />
-            <block class="Magento\LayeredNavigation\Block\Navigation\FilterRenderer" name="catalog.navigation.renderer" as="renderer" template="Magento_LayeredNavigation::layer/filter.phtml"/>
-        </block>
+        </block>    
     </referenceContainer>
 </body>
 </page>

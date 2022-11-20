@@ -9,18 +9,12 @@
  * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
  * @author Magedelight <info@Magedelight.com>
  */
-?>
-
-<?php
-//$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-//$productType = $objectManager->get('Magento\Framework\Registry')->registry('current_product')->getTypeId();
 $productType = 'simple';
-//$productType = $block->getProduct()->getTypeId();
+//@codingStandardsIgnoreStart
 ?>
-
 <div class="admin__field-complex">
-    <strong class="title"><?php /* @escapeNotVerified */
-        echo $block->getHeaderText() ?></strong>
+    <strong class="title"><?= /* @noEscape */
+        $block->getHeaderText() ?></strong>
     <div class="admin__field-complex-elements">
         <button class="action-default scalable add action-default primary" id="customer_price_add_customer"
                 onclick="showCustomerGrid();" type="button"><span>Add Customers</span></button>
@@ -29,16 +23,14 @@ $productType = 'simple';
 </div>
 <div class="loading-mask" id="loader" data-role="loader" style="display: none;">
     <div class="popup popup-loading">
-        <div class="popup-inner"><img src="<?php /* @escapeNotVerified */
-            echo $block->getViewFileUrl('images/loader-1.gif'); ?>"
-                                      alt="<?php /* @escapeNotVerified */
-                                      echo __('Loading...') ?>">Please wait...
+        <div class="popup-inner"><img src="<?= /* @noEscape */
+            $block->getViewFileUrl('images/loader-1.gif'); ?>"
+                                      alt="<?= /* @noEscape */
+                                         __('Loading...') ?>">Please wait...
         </div>
     </div>
 </div>
-<?php echo $block->getChildHtml() ?>
-
-
+<?= /* @noEscape */ $block->getChildHtml() ?>
 <script>
 
     function showCustomerGrid() {
@@ -58,11 +50,12 @@ $productType = 'simple';
 
     var templateText =
         '<tr class="option-row">' +
-        '<td><span><?php echo "{{cid}}" ?></span><input type="hidden" data-form-part="product_form" name="option[value][{{id}}][cid]" value="{{cid}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-        '<td><span><?php echo "{{cname}}" ?></span><input type="hidden" data-form-part="product_form" name="option[value][{{id}}][cname]" value="{{cname}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-        '<td><span><?php echo "{{email}}" ?></span><input type="hidden" data-form-part="product_form" name="option[value][{{id}}][email]" value="{{email}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-        '<td><input data-form-part="product_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required {{css_class}}" type="text" name="option[value][{{id}}][newprice]" value="{{newprice}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp;{{sign}}<\/td>' +
-        '<td><input data-form-part="product_form" style="width:20px;" class="input-text admin__control-text qty required-entry validate-greater-than-zero" type="text" name="option[value][{{id}}][qty]" value="{{qty}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/> and above <\/td>' +
+        '<td><select class="admin__control-select" name="option[value][{{id}}][website]" data-form-part="product_form"><?php echo "{{website}}"?></select></td>'+
+        '<td><span><?= /* @noEscape */ "{{cid}}" ?></span><input type="hidden" data-form-part="product_form" name="option[value][{{id}}][cid]" value="{{cid}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+        '<td><span><?= /* @noEscape */ "{{cname}}" ?></span><input type="hidden" data-form-part="product_form" name="option[value][{{id}}][cname]" value="{{cname}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+        '<td><span><?= /* @noEscape */ "{{email}}" ?></span><input type="hidden" data-form-part="product_form" name="option[value][{{id}}][email]" value="{{email}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+        '<td><input data-form-part="product_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required {{css_class}}" type="text" name="option[value][{{id}}][newprice]" value="{{newprice}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp;{{sign}}<\/td>' +
+        '<td><input data-form-part="product_form" style="width:20px;" class="input-text admin__control-text qty required-entry validate-greater-than-zero" type="text" name="option[value][{{id}}][qty]" value="{{qty}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/> and above <\/td>' +
         '<td id="delete_button_container_{{id}}">' +
         '<input data-form-part="product_form" type="hidden" class="delete-flag" name="option[value][{{id}}][del]" value="" />' +
         '<input data-form-part="product_form" type="hidden" class="delete-flag" name="option[value][{{id}}][pid]" value="{{pid}}" />' +
@@ -92,7 +85,8 @@ $productType = 'simple';
                         data.cname = row.cells[2].firstChild.nodeValue;
                         data.email = row.cells[3].firstChild.nodeValue;
                         data.newprice = "";
-                        data.pid = '<?php echo $this->getRequest()->getParam("id") ?>';
+                        data.pid = '<?= /* @noEscape */ $block->getRequest()->getParam("id") ?>';
+                        data.website = '<?php echo $this->getWebsiteHtml() ?>';
                     }
                     data.sign = '';
                     data.css_class = '';
@@ -244,4 +238,13 @@ $productType = 'simple';
         color: #e22626;
         content: '*';
     }
+     .ppc-admin-table .action-delete::before {
+        content: '\e630';
+        font-size: 2rem;
+        -webkit-font-smoothing: antialiased;
+        font-family: 'Admin Icons';
+        font-style: normal;
+        font-weight: normal;
+        line-height: 1;
+        speak: none;}
 </style>

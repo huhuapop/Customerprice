@@ -33,17 +33,27 @@ class Router implements \Magento\Framework\App\RouterInterface
     protected $scopeConfig;
 
     /**
-     * @param \Magento\Framework\App\ActionFactory     $actionFactory
+     * @var Data
+     */
+    protected $helper;
+
+    /**
+     *
+     * @param \Magento\Framework\App\ActionFactory $actionFactory
+     * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
      * @param \Magento\Framework\App\ResponseInterface $response
+     * @param \Magedelight\Customerprice\Helper\Data $helper
      */
     public function __construct(
         \Magento\Framework\App\ActionFactory $actionFactory,
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
-        \Magento\Framework\App\ResponseInterface $response
+        \Magento\Framework\App\ResponseInterface $response,
+        \Magedelight\Customerprice\Helper\Data $helper
     ) {
         $this->actionFactory = $actionFactory;
         $this->scopeConfig = $scopeConfig;
         $this->_response = $response;
+        $this->helper = $helper;
     }
 
     /**
@@ -55,6 +65,10 @@ class Router implements \Magento\Framework\App\RouterInterface
      */
     public function match(\Magento\Framework\App\RequestInterface $request)
     {
+        if (!$this->helper->isEnabled()) {
+            return null;
+        }
+        
         if ($request->getModuleName() == 'md_customerprice') {
             return;
         }
@@ -70,7 +84,7 @@ class Router implements \Magento\Framework\App\RouterInterface
         }
 
         return $this->actionFactory->create(
-            'Magento\Framework\App\Action\Forward',
+            \Magento\Framework\App\Action\Forward::class,
             ['request' => $request]
         );
     }

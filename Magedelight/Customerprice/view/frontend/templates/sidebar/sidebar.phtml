@@ -1,23 +1,26 @@
-<?php 
+<?php
 $customHelper = $this->helper('Magedelight\Customerprice\Helper\Data');
 $customerPriceIsEnabled = $customHelper->getConfig('customerprice/general/enable');
-$_categories = $block->getCategories(); 
-if($customerPriceIsEnabled == 1){
-?>
+$_categories = $block->getCategories();
+if ($block->getmoduleStatus()) { ?>
 <div class="block filter">
         <div class="content">
-            <strong class="subtitle"><?php /* @escapeNotVerified */ echo __('Shopping Options') ?></strong>
+            <strong class="subtitle"><?= /* @noEscape */ __('Shopping Options') ?></strong>
             <dl class="options" id="narrow-by-list2">
-                <dt class="block-title"><?php /* @escapeNotVerified */ echo __('Category') ?></dt>
+                <dt class="block-title"><?= /* @noEscape */ __('Category') ?></dt>
                 <dd>
                     <ol class="items">
-                        <?php foreach ($_categories as $category): 
+                        <?php foreach ($_categories as $category):
                             $_category = $block->getCategory($category->getCategoryId());
                             ?>
                             <?php if ($_category->getIsActive()): ?>
-                                <li class="item <?php if($_category->getId() == $this->getRequest()->getParam('catid')){ echo " active"; } ?>">
-                                    <a href="<?php /* @escapeNotVerified */ echo $block->getUrl('priceforcustomer', array('_query'=>array('catid'=>$_category->getId()))); ?>"><?php echo $block->escapeHtml($_category->getName()) ?></a>
-                                    
+                                <li class="item <?php /* @escapeNotVerified */
+                                if ($_category->getId() == $block->getRequest()->getParam('catid')) {
+                                    echo " active"; } ?>">
+                                    <a href="<?= /* @noEscape */ $block->getUrl('priceforcustomer', ['_query'=>
+                                        ['catid'=>$_category->getId()]]) ?>">
+                                    <?= /* @noEscape */ $block->escapeHtml($_category->getName()) ?>
+                                    </a>
                                 </li>
                             <?php endif; ?>
                         <?php endforeach ?>

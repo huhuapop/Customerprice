@@ -231,7 +231,7 @@ class Grid extends \Magento\Backend\Block\Widget\Grid\Extended
             'currency_code' => $this->getStore()->getCurrentCurrencyCode(),
             'rate' => $this->getStore()->getBaseCurrency()->getRate($this->getStore()->getCurrentCurrencyCode()),
             'index' => 'price',
-            'renderer' => 'Magedelight\Customerprice\Block\Adminhtml\Customer\Price\Search\Grid\Renderer\Price',
+            'renderer' => \Magedelight\Customerprice\Block\Adminhtml\Customer\Price\Search\Grid\Renderer\Price::class,
                 ]
         );
 

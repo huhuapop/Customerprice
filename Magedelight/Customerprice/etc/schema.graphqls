@@ -1,0 +1,111 @@
+
+# Copyright © Magento, Inc. All rights reserved.
+# See COPYING.txt for license details.
+
+type Query {
+    customerprice: [Customerprice] @resolver(class: "Magedelight\\Customerprice\\Model\\Resolver\\Customerprice") @doc(description: "Get list of Customer Price") @cache(cacheable: false)
+    categoryprice (pageSize: Int = 5 @doc(description: "How many items should show on the page"),
+    currentPage: Int = 1 @doc(description: "Allows to ussing paging it start with 1"),) : [Categoryprice] @resolver( class: "Magedelight\\Customerprice\\Model\\Resolver\\Categoryprice") @doc(description: "Get list of Category Price")
+}
+
+type Mutation {
+    createCustomerPrice (input: CreateCustomerPriceInput!): CreateCustomerPriceOutput @resolver(class: "\\Magedelight\\Customerprice\\Model\\Resolver\\CreateCustomerprice") @doc(descriptio:"Create customer price")
+    deleteCustomerPrice (customerprice_id: Int!): Boolean @resolver(class: "\\Magedelight\\Customerprice\\Model\\Resolver\\DeleteCustomerprice") @doc(description:"Delete a customer price")
+    createCategoryPrice (input: CreateCategoryPriceInput!): CreateCategoryPriceOutput @resolver(class: "\\Magedelight\\Customerprice\\Model\\Resolver\\CreateCategoryprice") @doc(description:"Create category price")
+    deleteCategoryPrice (categoryprice_id: Int!): Boolean @resolver(class: "\\Magedelight\\Customerprice\\Model\\Resolver\\DeleteCategoryprice") @doc(description:"Delete a category price")
+    createCustomerDiscount (input: CreateCustomerDiscountInput!): CreateCustomerDiscountOutput @resolver(class: "\\Magedelight\\Customerprice\\Model\\Resolver\\CreateCustomerdiscount") @doc(description:"Create customer discount")
+    deleteCustomerDiscount (discount_id: Int!): Boolean @resolver(class: "\\Magedelight\\Customerprice\\Model\\Resolver\\DeleteCustomerdiscount") @doc(description:"Delete a customer discount")
+    }
+
+input CreateCustomerDiscountInput {
+    discount_id : Int @doc(description: "discount_id")
+    customer_id: Int @doc(description: "customer_id")
+    value : Float @doc(description: "value")
+} 
+
+type Customerprice {
+    customerprice_id : Int @doc(description: "customerprice_id")
+    customer_id : Int @doc(description: "customer_id")
+    customer_name : String @doc(description: "customer name")
+    customer_email : String @doc(description: "customer email")
+    product_id : Int @doc(description: "product id")
+    product_name : String @doc(description: "product name")
+    price : Int @doc(description: "price")
+    log_price : Int @doc(description: "log price")
+    new_price : Int @doc(description: "new price")
+    qty : Int @doc(description: "price")
+}
+
+input CreateCustomerPriceInput {
+    customerprice_id : Int @doc(description: "customerprice_id")
+    customerprice: String @doc(description: "customer price")
+    customer_id : Int @doc(description: "customer_id")
+    customer_name : String @doc(description: "customer name")
+    customer_email : String @doc(description: "customer email")
+    product_id : Int @doc(description: "product id")
+    product_name : String @doc(description: "product name")
+    price : Int @doc(description: "price")
+    log_price : Float @doc(description: "log price")
+    new_price : Float @doc(description: "new price")
+    qty : Int @doc(description: "price")
+}
+
+
+
+type CreateCustomerPriceOutput {
+    customer_price: Boolean @doc(description: "items")
+}
+
+type CustomerPriceItems {
+    customer_id : Int @doc(description: "customer_id")
+    customer_name : String @doc(description: "customer name")
+    customer_email : String @doc(description: "customer email")
+    product_name : String @doc(description: "product name")
+    price : Int @doc(description: "price")
+    log_price : Int @doc(description: "log price")
+    new_price : Int @doc(description: "new price")
+    qty : Int @doc(description: "price")
+}
+
+type Categoryprice {
+    categoryprice_id : Int @doc(description: "categoryprice_id")
+    customer_id : Int @doc(description: "customer_id")
+    customer_name : String @doc(description: "customer name")
+    customer_email : String @doc(description: "customer email")
+    category_id : Int @doc(description: "category id")
+    category_name : String @doc(description: "category name")
+    price : Int @doc(description: "price")
+    discount : Float @doc(description: "discount")
+}
+
+input CreateCategoryPriceInput {
+    categoryprice_id : Int @doc(description: "categoryprice_id")
+    customer_id : Int @doc(description: "customer_id")
+    customer_name : String @doc(description: "customer name")
+    customer_email : String @doc(description: "customer email")
+    category_id : Int @doc(description: "category id")
+    category_name : String @doc(description: "category name")
+    price : Int @doc(description: "price")
+    discount : Float @doc(description: "discount")
+}
+
+type CreateCategoryPriceOutput {
+category_price: Boolean @doc(description: "items")
+}
+
+type CreateCustomerDiscountOutput {
+customer_discount: Boolean @doc(description: "items")
+}
+
+
+
+type CategoryPriceItems {
+     categoryprice_id : Int @doc(description: "categoryprice_id")
+    customer_id : Int @doc(description: "customer_id")
+    customer_name : String @doc(description: "customer name")
+    customer_email : String @doc(description: "customer email")
+    category_id : Int @doc(description: "category id")
+    category_name : String @doc(description: "category name")
+    price : Int @doc(description: "price")
+    discount : Int @doc(description: "discount")
+}

@@ -23,7 +23,6 @@ class Adjustment implements AdjustmentInterface
      */
     const ADJUSTMENT_CODE = 'pricepercustomer';
 
-
     /**
      * \Magento\Catalog\Helper\Data
      *

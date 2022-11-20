@@ -13,59 +13,48 @@
 
 namespace Magedelight\Customerprice\Block;
 
-use Magento\Customer\Model\Context;
-use Magento\Framework\App\Http\Context as CustomerContext;
-use Magento\Framework\App\ObjectManager;
-use Magento\Framework\View\Element\Template\Context as CurrentContext;
-use Magedelight\Customerprice\Helper\Data;
-use Magento\Framework\View\Element\Html\Link;
-use Magento\Store\Model\ScopeInterface;
-
-class Footerlink extends Link
+class Footerlink extends \Magento\Framework\View\Element\Html\Link
 {
     /**
-     * @var CustomerContext
+     * @var \Magento\Framework\App\Config\ScopeConfigInterface
      */
-    protected $customer;
+    protected $scopeConfig;
 
     /**
-     * @var Data
-     */
-    protected $helper;
-
-    /**
-     * Toplink constructor.
-     * @param CurrentContext $context
-     * @param CustomerContext $customer
-     * @param Data $helper
-     * @param array $data
+     * @param \Magento\Framework\View\Element\Template\Context   $context
+     * @param array                                              $data
      */
     public function __construct(
-        CurrentContext $context,
-        CustomerContext $customer,
-        Data $helper,
+        \Magento\Framework\View\Element\Template\Context $context,
+        \Magento\Framework\App\Http\Context $httpcontext,
         array $data = []
     ) {
-
+    
         parent::__construct($context, $data);
+        $this->httpcontext = $httpcontext;
         $this->scopeConfig = $context->getScopeConfig();
-        $this->customer = $customer;
-        $this->helper = $helper;
     }
 
     public function getHref()
     {
-        $isLoggedIn = $this->customer->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+        $context = $this->httpcontext;
+        $isLoggedIn = $context->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+
         if ($isLoggedIn) {
-            $url = trim($this->helper->getConfig('customerprice/general/identifier'));
+            $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+            $url = trim($this->scopeConfig->getValue('customerprice/general/identifier', $storeScope));
+
             return $this->getUrl($url);
+        } else {
+            return $this->getUrl('customer/account/login/');
         }
-        return $this->getUrl('customer/account/login/');
     }
 
     public function getLabel()
     {
-        $label = $this->helper->getConfig('customerprice/general/title');
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $label = $this->scopeConfig->getValue('customerprice/general/title', $storeScope);
+
         return __($label);
     }
 
@@ -74,12 +63,18 @@ class Footerlink extends Link
      */
     protected function _toHtml()
     {
-        if(!$this->helper->getConfig('customerprice/general/enable')) {
+        $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
+        $mode_enable = $this->scopeConfig->getValue('customerprice/general/enable', $storeScope);
+        $top_enable = $this->scopeConfig->getValue('customerprice/general/footer_enable', $storeScope);
+        
+        if (!$mode_enable) {
             return '';
         }
-        if(!$this->helper->getConfig('customerprice/general/footer_enable')) {
+        
+        if (!$top_enable) {
             return '';
         }
+
         return parent::_toHtml();
     }
 }

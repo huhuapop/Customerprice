@@ -1,25 +1,27 @@
 <?php
 /**
-* Magedelight
-* Copyright (C) 2017 Magedelight <info@Magedelight.com>
-*
-* @category Magedelight
-* @package Magedelight_Customerprice
-* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
-* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
-* @author Magedelight <info@Magedelight.com>
-*/
+ * Magedelight
+ * Copyright (C) 2017 Magedelight <info@Magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_Customerprice
+ * @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@Magedelight.com>
+ */
 ?>
 
 <div class="admin__page-section-title">
-    <strong class="title"><?php /* @escapeNotVerified */ echo $block->getHeaderText() ?></strong>
+    <strong class="title"><?= /* @noEscape */ $block->getHeaderText() ?></strong>
     <div class="actions">
-        <button class="action-secondary action-add" id="customer_price_add_category" type="button"><span>Add Category</span></button> 
+        <button class="action-secondary action-add" id="customer_price_add_category"
+                type="button"><span>Add Category</span>
+        </button>
       
     </div>
 </div>
 </br>
-<?php echo $block->getChildHtml('items_grid_category'); ?>
+<?= /* @noEscape */ $block->getChildHtml('items_grid_category'); //@codingStandardsIgnoreStart ?>
 <script>
 require(['jquery',
         'jquery/ui',
@@ -29,7 +31,7 @@ require(['jquery',
         jQuery = $;    
             jQuery(document).ready(function() {
                 
-                var exits = jQuery.parseJSON('<?php echo $block->getExistsCategory() ?>');  
+                var exits = jQuery.parseJSON('<?= /* @noEscape */ $block->getExistsCategory() ?>');  
                 jQuery('#customer_price_add_category').click(function() {
                     jQuery('#order-search-category').show();
                     this.hide();
@@ -47,7 +49,7 @@ require(['jquery',
                             var discount = "";
                             var sign = '';
                             var css_class = 'customs';
-                            var cid = '<?php echo $this->getRequest()->getParam("id") ?>';
+                            var cid = '<?= /* @noEscape */ $block->getRequest()->getParam("id") ?>';
                             var id = 'option_' + itemCount;
                             var item = generateLiTag(pname, pid, discount, sign, css_class, cid, id);
                             jQuery(item).hide().appendTo('#attribute-options-table-category tbody').fadeIn(1000);
@@ -65,7 +67,7 @@ require(['jquery',
                     var categoryVal = jQuery(this).attr('rel');
                     jQuery.ajax({
                         showLoader: true,
-                        url: "<?php echo $block->getUrl('md_customerprice/category/delete'); ?>",
+                        url: "<?= /* @noEscape */ $block->getUrl('md_customerprice/category/delete'); ?>",
                         data: {'id': categoryVal },
                         type: "POST",
                         dataType: 'json'
@@ -83,9 +85,9 @@ require(['jquery',
         function generateLiTag(pname, pid, discount, sign, css_class, cid, id) {
             var randlabelnumber = getRandomInt(1, 100000);
             var item = '<tr class="option-row ' + css_class + '" id = "category-row-'+ pid +'-'+randlabelnumber +'" >' +
-                '<td><span>' + pid + '</span><input data-form-part="customer_form" type="hidden" name="categoryoption[value][' + id + '][pid]" value="' + pid + '" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-                '<td><span><?php echo "' + pname + '" ?></span><input data-form-part="customer_form" type="hidden" name="categoryoption[value][' + id + '][pname]" value="' + pname + '" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-                '<td><input data-form-part="customer_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required validate-number validate-digits-range digits-range-0-100' + css_class + '" type="text" name="categoryoption[value][' + id + '][discount]" value="' + discount + '" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp; <strong>%</strong> &nbsp;' + sign + '<\/td>' + 
+                '<td><span>' + pid + '</span><input data-form-part="customer_form" type="hidden" name="categoryoption[value][' + id + '][pid]" value="' + pid + '" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+                '<td><span><?= /* @noEscape */ "' + pname + '" ?></span><input data-form-part="customer_form" type="hidden" name="categoryoption[value][' + id + '][pname]" value="' + pname + '" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+                '<td><input data-form-part="customer_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required validate-number validate-digits-range digits-range-0-100' + css_class + '" type="text" name="categoryoption[value][' + id + '][discount]" value="' + discount + '" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp; <strong>%</strong> &nbsp;' + sign + '<\/td>' +
                 '<td id="delete_button_container_' + id + '">' +
                 '<input data-form-part="customer_form" type="hidden" class="delete-flag" name="categoryoption[value][' + id + '][cid]" value="' + cid + '" />' +
                 '<button class="delete-option category-customer-unsaved" rel="category-row-'+ pid +'-'+randlabelnumber +'" type="button"><span>Remove Category</span><\/button>' +

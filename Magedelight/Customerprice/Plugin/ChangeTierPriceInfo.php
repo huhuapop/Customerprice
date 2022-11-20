@@ -27,7 +27,9 @@ class ChangeTierPriceInfo
         \Magento\Customer\Model\SessionFactory $customerSession,
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         OrderCreate $orderCreate,
-        \Magento\Framework\App\State $state
+        \Magento\Framework\App\State $state,
+        \Magento\Framework\App\Cache\TypeListInterface $cacheTypeList,
+        \Magento\Framework\App\Cache\Frontend\Pool $cacheFrontendPool
     ) {
         $this->logger = $logger;
         $this->helper = $helper;
@@ -36,6 +38,8 @@ class ChangeTierPriceInfo
         $this->_storeManager = $storeManager;
         $this->orderCreate = $orderCreate;
         $this->state = $state;
+        $this->_cacheTypeList = $cacheTypeList;
+        $this->_cacheFrontendPool = $cacheFrontendPool;
     }
 
     /**
@@ -46,6 +50,13 @@ class ChangeTierPriceInfo
     {
         $product = $subject->getProduct();
         if ($this->helper->isCustomerPriceAllow()) {
+            $types = array('collections');
+            foreach ($types as $type) {
+                $this->_cacheTypeList->cleanType($type);
+            }
+            foreach ($this->_cacheFrontendPool as $cacheFrontend) {
+                $cacheFrontend->getBackend()->clean();
+            }
             if ($product->getTypeId() == 'configurable') {
                 foreach ($product->getTypeInstance()->getUsedProducts($product) as $child) {
                     $this->setNewTierPrice($child);
@@ -79,11 +90,16 @@ class ChangeTierPriceInfo
             $customerId = $this->customerSession->create()->getCustomer()->getId();
         }
         if ($customerId) {
+            $websiteId = $this->getCurrentWebsiteId();
             // Tier Price Collection For Customer Price
             $tierPriceCollection = $this->customerPrice->getCollection()
                 ->addFieldToSelect('*')
                 ->addFieldToFilter('product_id', ['eq' => $product->getId()])
-                ->addFieldToFilter('customer_id', ['eq' => $customerId]);
+                ->addFieldToFilter('customer_id', ['eq' => $customerId])
+                ->addFieldToFilter('website_id', ['eq' => $websiteId]);
+
+            $logger = \Magento\Framework\App\ObjectManager::getInstance()->get(\Psr\Log\LoggerInterface::class);
+            $logger->info(print_r($tierPriceCollection->getData(),1));
 
             // Create an array of customer tier price
             if ($tierPriceCollection->getSize()) {
@@ -93,9 +109,10 @@ class ChangeTierPriceInfo
                 } else {
                     $groupId = $this->customerSession->create()->getCustomerGroupId();
                 }
-                $websiteId = $this->getCurrentWebsiteId();
+                //$websiteId = $this->getCurrentWebsiteId();
                 foreach ($newTierPrice as $price) {
-                    $res['website_id'] = $websiteId;
+                    //$res['website_id'] = $websiteId;
+                    $res['website_id'] = $price['website_id'];
                     $res['all_groups'] = 0;
                     $res['cust_group'] = $groupId;
                     $res['price'] = (float)$price['new_price'];

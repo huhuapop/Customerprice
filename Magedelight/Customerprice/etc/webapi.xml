@@ -1,0 +1,69 @@
+<?xml version="1.0" ?>
+<routes xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Webapi:etc/webapi.xsd">
+    <!--Api to get list of customer price start -->
+    <route method="GET" url="/V1/magedelight-customerprice/customerprice/search">
+        <service class="Magedelight\Customerprice\Api\CustomerpriceRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/magedelight-customerprice/customerprice">
+        <service class="Magedelight\Customerprice\Api\CustomerpriceRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/magedelight-customerprice/customerprice/:customerpriceId">
+        <service class="Magedelight\Customerprice\Api\CustomerpriceRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/magedelight-customerprice/customerprice/:customerpriceId">
+        <service class="Magedelight\Customerprice\Api\CustomerpriceRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    
+    <!--Api to get list of customer price end -->
+    
+    <!--Api to get list of category price start -->
+    <route method="GET" url="/V1/magedelight-customerprice/categoryprice/search">
+        <service class="Magedelight\Customerprice\Api\CategorypriceRepositoryInterface" method="getList"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/magedelight-customerprice/categoryprice">
+        <service class="Magedelight\Customerprice\Api\CategorypriceRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="PUT" url="/V1/magedelight-customerprice/categoryprice/:categorypriceId">
+        <service class="Magedelight\Customerprice\Api\CategorypriceRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/magedelight-customerprice/categoryprice/:categorypriceId">
+        <service class="Magedelight\Customerprice\Api\CategorypriceRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="POST" url="/V1/magedelight-customerprice/categorydiscount">
+        <service class="Magedelight\Customerprice\Api\CustomerdiscountRepositoryInterface" method="save"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <route method="DELETE" url="/V1/magedelight-customerprice/categorydiscount/:discountId">
+        <service class="Magedelight\Customerprice\Api\CustomerdiscountRepositoryInterface" method="deleteById"/>
+        <resources>
+            <resource ref="anonymous"/>
+        </resources>
+    </route>
+    <!--Api to get list of category price end -->
+</routes>

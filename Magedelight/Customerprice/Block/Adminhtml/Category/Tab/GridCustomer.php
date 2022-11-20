@@ -17,6 +17,7 @@ use Magento\CatalogInventory\Api\StockRegistryInterface;
 use Magento\CatalogInventory\Api\StockStateInterface;
 use Magento\Framework\Pricing\PriceCurrencyInterface;
 use Magento\Framework\ObjectManagerInterface;
+use Magedelight\Customerprice\Model\CategorypriceFactory;
 
 /**
  * Adminhtml sales order create items grid block.
@@ -78,19 +79,27 @@ class GridCustomer extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractC
     protected $stockState;
 
     /**
+     * @var \Magento\Framework\Escaper
+     */
+    protected $escaper;
+
+    /**
+     *
      * @param \Magento\Backend\Block\Template\Context $context
-     * @param \Magento\Backend\Model\Session\Quote    $sessionQuote
-     * @param \Magento\Sales\Model\AdminOrder\Create  $orderCreate
-     * @param PriceCurrencyInterface                  $priceCurrency
+     * @param \Magento\Backend\Model\Session\Quote $sessionQuote
+     * @param \Magento\Sales\Model\AdminOrder\Create $orderCreate
+     * @param PriceCurrencyInterface $priceCurrency
      * @param \Magento\Wishlist\Model\WishlistFactory $wishlistFactory
-     * @param \Magento\GiftMessage\Model\Save         $giftMessageSave
-     * @param \Magento\Tax\Model\Config               $taxConfig
-     * @param \Magento\Tax\Helper\Data                $taxData
-     * @param \Magento\GiftMessage\Helper\Message     $messageHelper
-     * @param StockRegistryInterface                  $stockRegistry
-     * @param StockStateInterface                     $stockState
-     * @param array                                   $data
-     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     * @param \Magento\GiftMessage\Model\Save $giftMessageSave
+     * @param \Magento\Tax\Model\Config $taxConfig
+     * @param \Magento\Tax\Helper\Data $taxData
+     * @param \Magento\GiftMessage\Helper\Message $messageHelper
+     * @param StockRegistryInterface $stockRegistry
+     * @param StockStateInterface $stockState
+     * @param ObjectManagerInterface $objectManager
+     * @param Categoryprice $categoryprice
+     * @param \Magento\Framework\Escaper
+     * @param array $data
      */
     public function __construct(
         \Magento\Backend\Block\Template\Context $context,
@@ -105,6 +114,8 @@ class GridCustomer extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractC
         StockRegistryInterface $stockRegistry,
         StockStateInterface $stockState,
         ObjectManagerInterface $objectManager,
+        CategorypriceFactory $categoryprice,
+        \Magento\Framework\Escaper $escaper,
         array $data = []
     ) {
         $this->_messageHelper = $messageHelper;
@@ -115,6 +126,8 @@ class GridCustomer extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractC
         $this->stockRegistry = $stockRegistry;
         $this->stockState = $stockState;
         $this->_objectManager = $objectManager;
+        $this->categoryprice = $categoryprice;
+        $this->escaper = $escaper;
         parent::__construct($context, $sessionQuote, $orderCreate, $priceCurrency, $data);
     }
 
@@ -130,8 +143,7 @@ class GridCustomer extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractC
     public function getOptionValues()
     {
         $categoryId = $this->getRequest()->getParam('id');
-        $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $optionCollection = $objectManager->create('\Magedelight\Customerprice\Model\Categoryprice')
+        $optionCollection = $this->categoryprice->create()
                 ->getCollection()
                 ->addFieldToSelect('*')->addFieldToFilter('category_id', ['eq' => $categoryId])
                 ->setOrder('customer_id');
@@ -141,7 +153,7 @@ class GridCustomer extends \Magento\Sales\Block\Adminhtml\Order\Create\AbstractC
         
         foreach ($optionCollection as $key => $option) {
             $finaldata[$key]['id'] = $key;
-            $finaldata[$key]['pname'] = htmlspecialchars($option['customer_name']);
+            $finaldata[$key]['pname'] = $this->escaper->escapeHtml($option['customer_name']);
             $finaldata[$key]['pid'] = $option['customer_id'];
             $finaldata[$key]['discount'] = $option['discount'];
             $finaldata[$key]['css_class'] = '';

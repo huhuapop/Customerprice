@@ -12,10 +12,12 @@ class CustomerContext
         $this->customerSession = $customerSession;
     }
     /**
-     * \Magento\Framework\App\Http\Context::getVaryString is used by Magento to retrieve unique identifier for selected context,
+     * \Magento\Framework\App\Http\Context::getVaryString
+     * is used by Magento to retrieve unique identifier
+     * for selected context,
      * so this is a best place to declare custom context variables
      */
-    function beforeGetVaryString(\Magento\Framework\App\Http\Context $subject)
+    public function beforeGetVaryString(\Magento\Framework\App\Http\Context $subject)
     {
         $customerId = 0;
         if ($this->customerSession->isLoggedIn()) {

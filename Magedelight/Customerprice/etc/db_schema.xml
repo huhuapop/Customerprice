@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+  <table name="customerprice" resource="default" engine="innodb" comment="customerprice">
+    <column xsi:type="int" name="customerprice_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Customer Price Id"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer Id"/>
+    <column xsi:type="varchar" name="customer_name" nullable="true" length="255" comment="Customer Name"/>
+    <column xsi:type="varchar" name="customer_email" nullable="true" length="255" comment="Customer Email"/>
+    <column xsi:type="int" name="product_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Product ID"/>
+    <column xsi:type="varchar" name="product_name" nullable="true" length="255" comment="Product Name"/>
+    <column xsi:type="varchar" name="price" nullable="true" length="255" comment="Price"/>
+    <column xsi:type="varchar" name="log_price" nullable="true" length="255" comment="Log Price"/>
+    <column xsi:type="varchar" name="new_price" nullable="true" length="255" comment="New Price"/>
+    <column xsi:type="int" name="qty" padding="10" unsigned="true" nullable="true" identity="false" comment="Quantity"/>
+    <column xsi:type="int" name="website_id" padding="11" unsigned="false" nullable="true" identity="false" comment="Website Id"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="customerprice_id"/>
+    </constraint>
+    <constraint xsi:type="unique" referenceId="CUSTOMERPRICE_CUSTOMER_ID_PRODUCT_ID_QTY" disabled="true">
+      <column name="customer_id"/>
+      <column name="product_id"/>
+      <column name="qty"/>
+    </constraint>
+  </table>
+  <table name="customerprice_discount" resource="default" engine="innodb" comment="customerprice_discount">
+    <column xsi:type="int" name="discount_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Discount Id"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer ID"/>
+    <column xsi:type="varchar" name="value" nullable="true" length="255" comment="value"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="discount_id"/>
+    </constraint>
+  </table>
+  <table name="md_categoryprice" resource="default" engine="innodb" comment="Category Price link">
+    <column xsi:type="int" name="categoryprice_id" padding="11" unsigned="false" nullable="false" identity="true" comment="Category Price Id"/>
+    <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Customer Id"/>
+    <column xsi:type="varchar" name="customer_name" nullable="true" length="255" comment="Customer Name"/>
+    <column xsi:type="varchar" name="customer_email" nullable="true" length="255" comment="Customer Email"/>
+    <column xsi:type="int" name="category_id" padding="10" unsigned="true" nullable="true" identity="false" comment="Category ID"/>
+    <column xsi:type="varchar" name="category_name" nullable="true" length="255" comment="Category Name"/>
+    <column xsi:type="varchar" name="discount" nullable="true" length="255" comment="Discount ID"/>
+    <constraint xsi:type="primary" referenceId="PRIMARY">
+      <column name="categoryprice_id"/>
+    </constraint>
+  </table>
+</schema>

@@ -1,24 +1,28 @@
 <?php
 /**
-* Magedelight
-* Copyright (C) 2017 Magedelight <info@Magedelight.com>
-*
-* @category Magedelight
-* @package Magedelight_Customerprice
-* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
-* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
-* @author Magedelight <info@Magedelight.com>
-*/
+ * Magedelight
+ * Copyright (C) 2017 Magedelight <info@Magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_Customerprice
+ * @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@Magedelight.com>
+ */
+//@codingStandardsIgnoreStart
 ?>
 
 <div class="admin__page-section-title">
-    <strong class="title"><?php /* @escapeNotVerified */ echo $block->getHeaderText() ?></strong>
+    <strong class="title"><?= /* @noEscape */ $block->getHeaderText() ?></strong>
     <div class="actions">
-        <button class="action-secondary action-add" id="customer_price_add_product" onclick="showProductGrid();" type="button"><span>Add Products</span></button> 
+        <button class="action-secondary action-add" id="customer_price_add_product"
+                onclick="showProductGrid();"
+                type="button"><span>Add Products</span>
+        </button>
       
     </div>
 </div>
-<?php echo $block->getChildHtml('items_grid') ?>
+<?= /* @noEscape */ $block->getChildHtml('items_grid') ?>
 <script>
 
 
@@ -35,7 +39,7 @@
         var validator = new Validation(formToValidate);
         if (validator.validate()) {
 
-            jQuery.ajax('<?php echo $this->getUrl("md_customerprice/customer/save") ?>?isAjax=true', {
+            jQuery.ajax('<?= /* @noEscape */ $block->getUrl("md_customerprice/customer/save") ?>?isAjax=true', {
                 data: {data: $('edit_form').serialize()},
                 method: 'POST',
                 dataType: 'json',
@@ -78,11 +82,12 @@
 
     var templateText =
             '<tr class="option-row">' +
-            '<td><span><?php echo "{{pid}}" ?></span><input data-form-part="customer_form" type="hidden" name="option[value][{{id}}][pid]" value="{{pid}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-            '<td><span><?php echo "{{pname}}" ?></span><input data-form-part="customer_form" type="hidden" name="option[value][{{id}}][pname]" value="{{pname}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-            '<td><span><?php echo "{{price}}" ?></span><input data-form-part="customer_form" type="hidden" name="option[value][{{id}}][price]" value="{{price}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
-            '<td><input data-form-part="customer_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required {{css_class}}" type="text" name="option[value][{{id}}][newprice]" value="{{newprice}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp;{{sign}}<\/td>' +
-            '<td><input data-form-part="customer_form" style="width:20px;" class="input-text admin__control-text qty required-entry validate-greater-than-zero" type="text" name="option[value][{{id}}][qty]" value="{{qty}}" <?php if ($this->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/> and above <\/td>' +
+            '<td><select class="admin__control-select" name="option[value][{{id}}][website]" data-form-part="customer_form"><?php echo "{{website}}"?></select></td>'+
+            '<td><span><?= /* @noEscape */ "{{pid}}" ?></span><input data-form-part="customer_form" type="hidden" name="option[value][{{id}}][pid]" value="{{pid}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+            '<td><span><?= /* @noEscape */ "{{pname}}" ?></span><input data-form-part="customer_form" type="hidden" name="option[value][{{id}}][pname]" value="{{pname}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+            '<td><span><?= /* @noEscape */ "{{price}}" ?></span><input data-form-part="customer_form" type="hidden" name="option[value][{{id}}][price]" value="{{price}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/><\/td>' +
+            '<td><input data-form-part="customer_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required {{css_class}}" type="text" name="option[value][{{id}}][newprice]" value="{{newprice}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/>&nbsp;{{sign}}<\/td>' +
+            '<td><input data-form-part="customer_form" style="width:20px;" class="input-text admin__control-text qty required-entry validate-greater-than-zero" type="text" name="option[value][{{id}}][qty]" value="{{qty}}" <?php if ($block->getReadOnly()): ?> disabled="disabled"<?php endif; ?>/> and above <\/td>' +
             '<td id="delete_button_container_{{id}}">' +
             '<input data-form-part="customer_form" type="hidden" class="delete-flag" name="option[value][{{id}}][del]" value="" />' +
             '<input data-form-part="customer_form" type="hidden" class="delete-flag" name="option[value][{{id}}][cid]" value="{{cid}}" />' +
@@ -96,14 +101,15 @@
         templateSyntax: /(^|.|\r|\n)({{(\w+)}})/,
         templateText: templateText,
         itemCount: 0,
-        producttype: '<?php echo __('Bundle Product') ?>',
+        producttype: '<?= /* @noEscape */ __('Bundle Product') ?>',
         totalItems: 0,
         totalRows: 0,
         isReadOnly: false,
         add: function (data) {
             this.template = new Template(this.templateText, this.templateSyntax);
             var isNewOption = false;
-            var refTab = document.getElementById("customerprice_product_search_grid_table").getElementsByTagName('tbody')[0];
+            var refTab = document.getElementById("customerprice_product_search_grid_table").
+            getElementsByTagName('tbody')[0];
             for (var i = 0; row = refTab.rows[i]; i++) {
                 row = refTab.rows[i];
                 if (row.cells[0].children[0].down().checked) {
@@ -119,8 +125,8 @@
                             data.sign = '%';
                             data.css_class = 'validate-greater-than-zero validate-percents';
                         }
-
-                        data.cid = '<?php echo $this->getRequest()->getParam("id") ?>';
+                        data.website = '<?php echo $this->getWebsiteHtml() ?>';
+                        data.cid = '<?= /* @noEscape */ $block->getRequest()->getParam("id") ?>';
                     }
                     data.id = 'option_' + this.itemCount;
                     isNewOption = true;

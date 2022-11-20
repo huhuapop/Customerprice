@@ -19,10 +19,15 @@ class Offers extends \Magento\Framework\App\Action\Action
     protected $scopeConfig;
 
     /**
-     * @param \Magento\Framework\View\Result\PageFactory         $resultPageFactory
-     * @param \Magento\Framework\DataObject                      $requestObject
-     * @param \Magento\Framework\App\Action\Context              $context
+     *
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Framework\DataObject $requestObject
+     * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+     * @param \Magento\Catalog\Model\Layer\Resolver $layerResolver
+     * @param \Magedelight\Customerprice\Helper\Data $helper
+     * @param \Magento\Framework\UrlInterface $url
+     * @param \Magento\Framework\App\Http\Context $httpContext
      */
     public function __construct(
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
@@ -31,7 +36,8 @@ class Offers extends \Magento\Framework\App\Action\Action
         \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
         \Magento\Catalog\Model\Layer\Resolver $layerResolver,
         \Magedelight\Customerprice\Helper\Data $helper,
-        \Magento\Framework\UrlInterface $url
+        \Magento\Framework\UrlInterface $url,
+        \Magento\Framework\App\Http\Context $httpContext
     ) {
         parent::__construct($context);
         $this->resultPageFactory = $resultPageFactory;
@@ -42,6 +48,7 @@ class Offers extends \Magento\Framework\App\Action\Action
         $this->url = $url;
         $this->response = $context->getResponse();
         $this->redirect = $context->getRedirect();
+        $this->httpContext = $httpContext;
     }
 
     public function execute()
@@ -61,10 +68,7 @@ class Offers extends \Magento\Framework\App\Action\Action
             }
 
             $resultPage->getConfig()->setPageLayout($layout);
-
-            $ObjectManager= \Magento\Framework\App\ObjectManager::getInstance();
-            $context = $ObjectManager->get('Magento\Framework\App\Http\Context');
-            $isLoggedIn = $context->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+            $isLoggedIn = $this->httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
 
             if ($isLoggedIn) {
                 return $resultPage;

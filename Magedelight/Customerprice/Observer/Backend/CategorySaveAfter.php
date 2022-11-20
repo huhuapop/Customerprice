@@ -40,7 +40,8 @@ class CategorySaveAfter implements ObserverInterface
         \Magento\Checkout\Model\Session $session,
         \Magento\Catalog\Model\Product\Type\Price $priceModel,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Customer\Model\Session $customerSession
+        \Magento\Customer\Model\Session $customerSession,
+        \Magedelight\Customerprice\Model\CategorypriceFactory $categoryprice
     ) {
         $this->request = $request;
         $this->logger = $logger;
@@ -49,12 +50,14 @@ class CategorySaveAfter implements ObserverInterface
         $this->_customerFactory = $customerFactory;
         $this->_priceModel = $priceModel;
         $this->customerSession = $customerSession;
+        $this->categoryprice = $categoryprice;
     }
 
     /**
      * @param \Magento\Framework\Event\Observer $observer
      *
      * @return bool
+     * @codingStandardsIgnoreStart
      */
     public function execute(\Magento\Framework\Event\Observer $observer)
     {
@@ -68,7 +71,8 @@ class CategorySaveAfter implements ObserverInterface
                 foreach ($options['customeroption'] as $key => $_options) {
                     foreach ($_options as $k => $value) {
                         if ($key == 'value') {
-                            $priceCustomerCategory = $this->_objectManager->create('Magedelight\Customerprice\Model\Categoryprice');
+                            //$priceCustomerCategory = $this->_objectManager->create('Magedelight\Customerprice\Model\Categoryprice');
+                            $priceCustomerCategory = $this->categoryprice->create();
                             $customer = $this->_customerFactory->create()->load($value['pid']);
                             if (is_int($k)) {
                                 $priceCustomerCategory->setCategorypriceId($k);
@@ -84,9 +88,6 @@ class CategorySaveAfter implements ObserverInterface
                     }
                 }
             }
-	    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-	    $cacheManager = $objectManager->create('Magento\Framework\App\Cache\Manager');
-	    $cacheManager->flush($cacheManager->getAvailableTypes());
         } else {
             $options = $this->request->getPostValue();
             if (isset($options['customeroption'])) {

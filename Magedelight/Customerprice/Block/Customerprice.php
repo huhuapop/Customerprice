@@ -40,6 +40,7 @@ class Customerprice extends \Magento\Catalog\Block\Product\ListProduct
         \Magento\Framework\Url\Helper\Data $urlHelper,
         productCollectionFactory $productCollectionFactory,
         \Magento\Framework\App\Request\Http $request,
+        \Magedelight\Customerprice\Helper\Data $helper,
         array $data = []
     ) {
         parent::__construct($context, $postDataHelper, $layerResolver, $categoryRepository, $urlHelper, $data);
@@ -49,6 +50,7 @@ class Customerprice extends \Magento\Catalog\Block\Product\ListProduct
         $this->productCollectionFactory = $productCollectionFactory;
         $this->request = $request;
         $this->scopeConfig = $context->getScopeConfig();
+        $this->helper = $helper;
     }
     
     public function _prepareLayout()
@@ -56,21 +58,68 @@ class Customerprice extends \Magento\Catalog\Block\Product\ListProduct
         $storeScope = \Magento\Store\Model\ScopeInterface::SCOPE_STORE;
         $title = $this->scopeConfig->getValue('customerprice/general/page_title', $storeScope);
         $this->pageConfig->getTitle()->set(__($title));
+        if ($this->_getProductCollection()) {
+            $toolbar = $this->getLayout()
+                       ->createBlock(
+                    'Magento\Catalog\Block\Product\ProductList\Toolbar',
+                    'custom_product_list_toolbar'
+                    )
+                    ->setTemplate('Magedelight_Customerprice::product/list/toolbar.phtml')
+                    ->setCollection($this->_getProductCollection());
+    
+                $pager = $this->getLayout()->createBlock(
+                    'Magento\Theme\Block\Html\Pager',
+                    'AllProduct.product.pager'
+                )->setAvailableLimit(array(12=>12,24=>24,36=>36))->setShowPerPage(true)->setCollection(
+                    $this->_getProductCollection()
+                );
+                $this->setChild('pager', $pager);
+                $this->setChild('toolbar', $toolbar);
+                $this->_getProductCollection()->load();
+            }
         return $this;
     }
 
     protected function _getProductCollection()
     {
         
-        if ($this->_productCollection === null) {
-            $this->_productCollection = $this->getLayer()->getProductCollection();
+        if ($this->_productCollection === null) {   
+            $page=($this->getRequest()->getParam('p'))? $this->getRequest()->getParam('p') : 1;
+            //get values of current limit
+            $pageSize=($this->getRequest()->getParam('limit'))? $this->getRequest()->getParam('limit') : 12;
+            $this->_productCollection = $this->getLayer()->getProductCollection()
+                                        ->setPageSize($pageSize)
+                                        ->setCurPage($page);
         }
         return $this->_productCollection;
+    }
+
+    public function getPagerHtml()
+    {
+        return $this->getChildHtml('pager');
+    }
+
+    public function getToolbarHtml()
+    {
+        return $this->getChildHtml('toolbar');
+    }
+
+    public function getMode()
+    {
+        return $this->getChildBlock('toolbar')->getCurrentMode();
     }
 
     public function getLayer()
     {
         $this->setLayer($this->_mdlayer);
         return $this->_mdlayer;
+    }
+
+    public function getmoduleStatus()
+    {
+        if ($this->helper->isEnabled()) {
+            return true;
+        }
+        return false;
     }
 }

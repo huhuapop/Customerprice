@@ -30,6 +30,7 @@ class RefreshCache implements ObserverInterface
      * @var Manager
      */
     private $cacheManager;
+    private $helper;
     
     /**
      * @param AbstractRestrictHelper $restrictHelper
@@ -38,11 +39,13 @@ class RefreshCache implements ObserverInterface
     public function __construct(
         Data $restrictHelper,
         Manager $cacheManager,
-        Request $request
+        Request $request,
+        Data $helper
     ) {
         $this->restrictHelper = $restrictHelper;
         $this->cacheManager = $cacheManager;
         $this->request = $request;
+        $this->helper = $helper;
     }
 
     /**
@@ -52,8 +55,18 @@ class RefreshCache implements ObserverInterface
 
     public function execute(Observer $observer)
     {
-        if ($this->restrictHelper->isEnabled() && $this->request->getRouteName() == 'md_customerprice') {
-            $this->cacheManager->clean($this->cacheManager->getAvailableTypes());
+        if ($this->helper->isEnabled()) 
+        {
+            $types = $this->cacheManager->getAvailableTypes();
+            $cac = array();
+            foreach($types as $t)
+            {
+                if($t == 'block_html')
+                {
+                    $cac[] = $t;
+                }
+            }
+            $this->cacheManager->clean($cac);
         }
     }
 }

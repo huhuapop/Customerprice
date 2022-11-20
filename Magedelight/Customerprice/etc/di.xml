@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
     <preference for="Magedelight\Customerprice\Model\Calculation\Calculator\CalculatorInterface" type="Magedelight\Customerprice\Model\Calculation\CalculationService" />
+    <preference for="Magedelight\Customerprice\Api\CustomerpriceManagementInterface" type="Magedelight\Customerprice\Model\CustomerpriceManagement"/>
+    <preference for="Magedelight\Customerprice\Api\CustomerpriceRepositoryInterface" type="Magedelight\Customerprice\Model\CustomerpriceRepository"/>
+    <preference for="Magedelight\Customerprice\Api\Data\CustomerpriceInterface" type="Magedelight\Customerprice\Model\Data\Customerprice"/>
+    <preference for="Magedelight\Customerprice\Api\Data\CustomerpriceSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="Magedelight\Customerprice\Api\CategorypriceRepositoryInterface" type="Magedelight\Customerprice\Model\CategorypriceRepository"/>
+    <preference for="Magedelight\Customerprice\Api\Data\CategorypriceInterface" type="Magedelight\Customerprice\Model\Data\Categoryprice"/>
+    <preference for="Magedelight\Customerprice\Api\Data\CategorypriceSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
+    <preference for="Magedelight\Customerprice\Api\CustomerdiscountRepositoryInterface" type="Magedelight\Customerprice\Model\CustomerdiscountRepository"/>
+    <preference for="Magedelight\Customerprice\Api\Data\CustomerdiscountInterface" type="Magedelight\Customerprice\Model\Data\Customerdiscount"/>
+    <preference for="Magedelight\Customerprice\Api\Data\CustomerdiscountSearchResultsInterface" type="Magento\Framework\Api\SearchResults"/>
     <type name="Magento\Catalog\Model\Product\PriceModifier\Composite">
         <arguments>
             <argument name="modifiers" xsi:type="array">
@@ -23,10 +33,10 @@
         </arguments>
     </virtualType>
     <type name="Magento\Catalog\Model\Product">
-        <plugin name="Magedelight_after_final_price" type="Magedelight\Customerprice\Plugin\ChangeTierPrice" sortOrder="999" disabled="false"  />
+        <plugin name="Magedelight_after_final_price" type="Magedelight\Customerprice\Plugin\ChangeTierPrice" sortOrder="999"  />
     </type>
     <type name="Magento\Catalog\Pricing\Price\FinalPrice">
-        <plugin name="Magedelight_after_final_price_info" type="Magedelight\Customerprice\Plugin\ChangeTierPriceInfo" sortOrder="999" disabled="false"  />
+        <plugin name="Magedelight_after_final_price_info" type="Magedelight\Customerprice\Plugin\ChangeTierPriceInfo" sortOrder="999"   />
     </type>
     <type name="Magento\Framework\Pricing\Adjustment\Collection">
         <arguments>

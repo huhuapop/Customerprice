@@ -19,25 +19,44 @@ class Save extends \Magento\Framework\App\Action\Action
     protected $resultPageFactory;
     protected $_customerFactory;
     protected $resultJsonFactory;
+    /**
+     * @var \Magento\Framework\Escaper
+     */
+    protected $escaper;
 
     /**
-     * @param \Magento\Framework\App\Action\Context            $context
-     * @param \Magento\Customer\Model\Session                  $customerSession
-     * @param \Magento\Framework\View\Result\PageFactory       $resultPageFactory
-     * @param \Magento\Customer\Model\CustomerFactory          $customerFactory
+     *
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Customer\Model\Session $customerSession
+     * @param \Magento\Framework\View\Result\PageFactory $resultPageFactory
+     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
      * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @param \Magedelight\Customerprice\Model\Discount $discount
+     * @param \Magedelight\Customerprice\Model\Customerprice $customerprice
+     * @param \Magento\Catalog\Model\Product $productModel
+     * @param \Magento\Framework\Escaper
      */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Customer\Model\Session $customerSession,
         \Magento\Framework\View\Result\PageFactory $resultPageFactory,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory,
+        \Magedelight\Customerprice\Model\DiscountFactory $discount,
+        \Magedelight\Customerprice\Model\CustomerpriceFactory $customerprice,
+        \Magento\Catalog\Model\ProductFactory $productModel,
+        \Zend\Uri\Uri $zendUri,
+        \Magento\Framework\Escaper $escaper
     ) {
         $this->_customerSession = $customerSession;
         $this->resultPageFactory = $resultPageFactory;
         $this->_customerFactory = $customerFactory;
         $this->resultJsonFactory = $resultJsonFactory;
+        $this->discount = $discount;
+        $this->customerprice = $customerprice;
+        $this->productModel = $productModel;
+        $this->zendUri = $zendUri;
+        $this->escaper = $escaper;
         parent::__construct($context);
     }
 
@@ -47,18 +66,16 @@ class Save extends \Magento\Framework\App\Action\Action
     public function execute()
     {
         $params = $this->getRequest()->getParams();
-        
-        parse_str($params['data'], $options);
+        $this->zendUri->setQuery($params['data']);
+        $options = $this->zendUri->getQueryAsArray();
 
         $append = '';
         $success = false;
-
         $discountValue = $options['product'];
-
         $customer_id = $options['customer']['customer_id'];
 
         $discount = $this->getDiscountByCustomerId($customer_id);
-        if (!is_null($discount) && $discount->getId()) {
+        if (!($discount === null) && $discount->getId()) {
             if (is_numeric($discountValue['discount'])) {
                 $discount->setValue($discountValue['discount'])->setId($discount->getId())->save();
             } else {
@@ -66,12 +83,12 @@ class Save extends \Magento\Framework\App\Action\Action
             }
         } else {
             if (is_numeric($discountValue['discount'])) {
-                $discountModel = $this->_objectManager->create('Magedelight\Customerprice\Model\Discount')
-                        ->setData(['customer_id' => $customer_id, 'value' => $discountValue['discount']]);
+                $discountModel = $this->discount->create();
+                $discountModel->setData(['customer_id' => $customer_id, 'value' => $discountValue['discount']]);
                 try {
                     $discountModel->save();
                 } catch (\Exception $e) {
-                    //Mage::log($e->getMessage(), false, 'discount-exception.log');
+                    return false;
                 }
             }
         }
@@ -81,25 +98,25 @@ class Save extends \Magento\Framework\App\Action\Action
                 if ($key == 'value') {
                     /* ---Delete--- */
                     if ($value['del'] == 1 && is_int($k)) {
-                        $priceCustomerDel = $this->_objectManager->create('Magedelight\Customerprice\Model\Customerprice')
-                                ->load($k)
-                                ->delete();
+                        $priceCustomerDel = $this->customerprice->create();
+                        $priceCustomerDel->load($k);
+                        $priceCustomerDel->delete();
                         unset($_options[$k]);
                         $success = true;
                         continue;
                     }
 
                     /* ---Insert---- */
-                    $priceCustomer = $this->_objectManager->create('Magedelight\Customerprice\Model\Customerprice');
+                    $priceCustomer = $this->customerprice->create();
 
                     if (is_int($k)) {
                         $priceCustomer->setId($k);
                     }
-                    //die($value['cid']);
                     $newPrice = $value['newprice'];
 
-                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-                    $product = $objectManager->get('Magento\Catalog\Model\Product')->load(trim($value['pid']));
+                    //$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    $productModel = $this->productModel->create();
+                    $product = $productModel->load(trim($value['pid']));
 
                     $customer = $this->_customerFactory->create()->load($value['cid']);
 
@@ -126,7 +143,9 @@ class Save extends \Magento\Framework\App\Action\Action
 
                         $success = true;
                     } catch (\Exception $e) {
-                        $append .= '<div id="messages"><div class="messages"><div class="message message-error error"><div data-ui-id="messages-message-error">'.$e->getMessage().'</div></div></div></div>';
+                        $append .= '<div id="messages"><div class="messages"><div class="message message-error error">
+                        <div data-ui-id="messages-message-error">'.$e->getMessage().'
+                        </div></div></div></div>';
                         $result = ['error' => true, 'message' => $append];
                         $resultJson = $this->resultJsonFactory->create();
                         $resultJson->setData($result);
@@ -139,7 +158,9 @@ class Save extends \Magento\Framework\App\Action\Action
 
         $items = $this->getOptionValues($options['customer_id']);
         if ($success == true) {
-            $append .= '<div id="messages"><div class="messages"><div class="message message-success success"><div data-ui-id="messages-message-success">'.__('Prices saved successfully.').'</div></div></div></div>';
+            $append .= '<div id="messages"><div class="messages"><div class="message message-success success">
+            <div data-ui-id="messages-message-success">'.__('Prices saved successfully.').'
+            </div></div></div></div>';
             $result = ['error' => false, 'message' => $append, 'items' => $items];
         }
         $resultJson = $this->resultJsonFactory->create();
@@ -150,7 +171,7 @@ class Save extends \Magento\Framework\App\Action\Action
 
     public function getDiscountByCustomerId($customerId)
     {
-        $discount = $this->_objectManager->create('Magedelight\Customerprice\Model\Discount')->getCollection()
+        $discount = $this->discount->create()->getCollection()
                 ->addFieldToFilter('customer_id', ['eq' => $customerId])
                 ->getFirstItem();
         if ($discount->getId()) {
@@ -170,7 +191,7 @@ class Save extends \Magento\Framework\App\Action\Action
         $finaldata = [];
         if ($customerId) {
             $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $optionCollection = $objectManager->create('\Magedelight\Customerprice\Model\Customerprice')
+            $optionCollection = $this->customerprice->create()
                     ->getCollection()
                     ->addFieldToSelect('*')->addFieldToFilter('customer_id', ['eq' => $customerId])
                     ->setOrder('product_id');
@@ -181,11 +202,12 @@ class Save extends \Magento\Framework\App\Action\Action
             $productObj = [];
             foreach ($optionCollection as $key => $option) {
                 if (!isset($productObj[$option['product_id']])) {
-                    $productObj[$option['product_id']] = $objectManager->get('Magento\Catalog\Model\Product')->load(trim($option['product_id']))->getTypeId();
+                    $productObj[$option['product_id']] = $this->productModel->create()->
+                    load(trim($option['product_id']))->getTypeId();
                 }
                 //$rowObj = new Varien_Object();
                 $finaldata[$key]['id'] = $key;
-                $finaldata[$key]['pname'] = htmlspecialchars($option['product_name']);
+                $finaldata[$key]['pname'] = $this->escaper->escapeHtml($option['product_name']);
                 $finaldata[$key]['pid'] = $option['product_id'];
                 $finaldata[$key]['price'] = $option['price'];
                 $finaldata[$key]['newprice'] = $option['log_price'];

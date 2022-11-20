@@ -13,131 +13,48 @@
 
 namespace Magedelight\Customerprice\Model;
 
-use Magedelight\Customerprice\Model\ResourceModel\Discount\CollectionFactory;
-use Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory as AttributeCollectionFactory;
-use Magento\Bundle\Model\Product\Type;
 use Magento\Catalog\Api\CategoryRepositoryInterface;
-use Magento\Catalog\Model\CategoryFactory;
-use Magento\Catalog\Model\Config;
-use Magento\Catalog\Model\Layer\ContextInterface;
-use Magento\Catalog\Model\Layer\StateFactory;
-use Magento\Catalog\Model\Product\Visibility;
-use Magento\Catalog\Model\ProductFactory;
 use Magento\Catalog\Model\ResourceModel;
-use Magento\Catalog\Model\ResourceModel\Product;
-use Magento\Catalog\Model\ResourceModel\Product\Collection;
-use Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable;
-use Magento\Customer\Model\SessionFactory;
-use Magento\Framework\App\Request\Http;
-use Magento\Framework\Registry;
-use Magento\GroupedProduct\Model\Product\Type\Grouped;
-use Magento\Store\Model\StoreManagerInterface;
 
 class Layer extends \Magento\Catalog\Model\Layer
 {
-    /**
-     * @var array
-     */
+    
     protected $_productCollection = [];
-
-    /**
-     * @var Config
-     */
+     
     protected $catalogConfig;
-
-    /**
-     * @var Visibility
-     */
+      
     protected $productVisibility;
-
+     
     /**
-     * @var SessionFactory
-     */
-    protected $customerSession;
-
-    /**
-     * @var ResourceModel\Discount\CollectionFactory
-     */
-    protected $discountFactory;
-
-    /**
-     * @var Customerprice
-     */
-    protected $customerprice;
-
-    /**
-     * @var Categoryprice
-     */
-    protected $categoryprice;
-
-    /**
-     * @var CategoryFactory
-     */
-    protected $categoryFactory;
-
-    /**
-     * @var ProductFactory
-     */
-    protected $mdproductcollection;
-
-    /**
-     * @var Type
-     */
-    protected $type;
-
-    /**
-     * @var Grouped
-     */
-    protected $grouped;
-
-    /**
-     * @var Configurable
-     */
-    protected $configurable;
-
-    /**
-     * Layer constructor.
      * @param ContextInterface $context
      * @param StateFactory $layerStateFactory
-     * @param ResourceModel\Product\Attribute\CollectionFactory $attributeCollectionFactory
-     * @param Product $catalogProduct
-     * @param StoreManagerInterface $storeManager
-     * @param SessionFactory $customerSession
-     * @param Categoryprice $categoryprice
-     * @param Customerprice $customerprice
-     * @param Configurable $configurable
-     * @param Grouped $grouped
-     * @param Type $type
-     * @param CategoryFactory $categoryFactory
-     * @param Registry $registry
+     * @param \Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory $attributeCollectionFactory
+     * @param \Magento\Catalog\Model\ResourceModel\Product $catalogProduct
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Framework\Registry $registry
      * @param CategoryRepositoryInterface $categoryRepository
-     * @param Http $request
-     * @param Config $catalogConfig
-     * @param Visibility $productVisibility
-     * @param ProductFactory $productcollectionFactory
-     * @param ResourceModel\Discount\CollectionFactory $discountFactory
      * @param array $data
      */
     public function __construct(
-        ContextInterface $context,
-        StateFactory $layerStateFactory,
-        AttributeCollectionFactory $attributeCollectionFactory,
-        Product $catalogProduct,
-        StoreManagerInterface $storeManager,
-        SessionFactory $customerSession,
-        Categoryprice $categoryprice,
-        Customerprice $customerprice,
-        Configurable $configurable,
-        Grouped $grouped,
-        Type $type,
-        CategoryFactory $categoryFactory,
-        Registry $registry,
+        \Magento\Catalog\Model\Layer\ContextInterface $context,
+        \Magento\Catalog\Model\Layer\StateFactory $layerStateFactory,
+        \Magento\Catalog\Model\ResourceModel\Product\Attribute\CollectionFactory $attributeCollectionFactory,
+        \Magento\Catalog\Model\ResourceModel\Product $catalogProduct,
+        \Magento\Store\Model\StoreManagerInterface $storeManager,
+        \Magento\Customer\Model\SessionFactory $customerSession,
+        \Magedelight\Customerprice\Model\Categoryprice $categoryprice,
+        \Magedelight\Customerprice\Model\Customerprice $customerprice,
+        \Magento\ConfigurableProduct\Model\ResourceModel\Product\Type\Configurable $configurable,
+        \Magento\GroupedProduct\Model\Product\Type\Grouped $grouped,
+        \Magento\Bundle\Model\Product\Type $type,
+        \Magento\Catalog\Model\CategoryFactory $categoryFactory,
+        \Magento\Framework\Registry $registry,
         CategoryRepositoryInterface $categoryRepository,
-        Http $request,
-        Config $catalogConfig,
-        Visibility $productVisibility,
-        ProductFactory $productcollectionFactory,
-        CollectionFactory $discountFactory,
+        \Magento\Framework\App\Request\Http $request,
+        \Magento\Catalog\Model\Config $catalogConfig,
+        \Magento\Catalog\Model\Product\Visibility $productVisibility,
+        \Magento\Catalog\Model\ProductFactory $productcollectionFactory,
+        \Magedelight\Customerprice\Model\ResourceModel\Discount\CollectionFactory $discountFactory,
         array $data = []
     ) {
         parent::__construct(
@@ -162,111 +79,138 @@ class Layer extends \Magento\Catalog\Model\Layer
         $this->categoryprice = $categoryprice;
         $this->mdproductcollection = $productcollectionFactory;
         $this->discountFactory = $discountFactory;
-        $this->collectionProvider = $context->getCollectionProvider();
     }
 
-    /**
-     * @return Collection
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
     public function getProductCollection()
     {
+
         $customerId = $this->customerSession->create()->getCustomerId();
-        if (isset($this->_productCollections[$this->getCurrentCategory()->getId()])) {
-            $collection = $this->_productCollections[$this->getCurrentCategory()->getId()];
+
+        if (isset($this->_productCollection[$customerId])) {
+            $collection = $this->_productCollection[$customerId];
         } else {
-            $collection = $this->collectionProvider->getCollection($this->getCurrentCategory());
-            $this->prepareProductCollection($collection);
-            $discountLoad = $this->discountFactory->create()
-                ->addFieldToFilter('customer_id', ['eq' => $customerId])
-                ->getFirstItem();
-            if(!$discountLoad->hasData()) {
-                $this->FilterByCustomerDiscount($collection,$customerId);
+            $productIds = $this->getCustomerProductIds();
+            $collection = $this->mdproductcollection->create()->getCollection();
+            if (!empty($productIds)) {
+                $collection->addAttributeToSelect('*')->addIdFilter($productIds);
+            } else {
+                $discountLoad = $this->discountFactory->create()
+                        ->addFieldToFilter('customer_id', ['eq' => $customerId])
+                        ->getFirstItem();
+                if ($discountLoad->getDiscountId()) {
+                    $collection->addFieldToFilter('entity_id', '0');
+                } else {
+                    $collection->addFieldToFilter('entity_id', '0');
+                }
             }
-            $this->_productCollections[$this->getCurrentCategory()->getId()] = $collection;
+            /* else {
+                $collection->addFieldToFilter('entity_id', '0');
+            }*/
+            $this->prepareProductCollection($collection);
+            if (!empty($collection)) {
+                $this->_productCollection[$customerId] = $collection;
+            } else {
+                $this->_productCollection[$customerId] = '';
+            }
         }
         return $collection->distinct(true);
     }
 
-    /**
-     * @param Collection $collection
-     * @return $this|\Magento\Catalog\Model\Layer
-     * @throws \Magento\Framework\Exception\NoSuchEntityException
-     */
     public function prepareProductCollection($collection)
     {
-        $collection->addAttributeToSelect($this->catalogConfig->getProductAttributes())
+        $collection
+            ->addAttributeToSelect($this->catalogConfig->getProductAttributes())
             ->setStore($this->_storeManager->getStore())
             ->addMinimalPrice()
             ->addTaxPercents()
             ->addStoreFilter()
             ->setVisibility($this->productVisibility->getVisibleInCatalogIds());
+
         return $this;
     }
-
-    /**
-     * @param $collection
-     * @param $customerId
-     * @return Collection
-     */
-    public function FilterByCustomerDiscount($collection,$customerId) {
-        $ids = array();
-        $result = array();
-        $allIds = array();
-        $configurableIds = array();
-        $groupedIds = array();
-        $bundleIds = array();
-        $productIds = array();
-        /* @var $collection Collection */
-        $categoryCollection = $this->categoryprice->getCollection()
-            ->addFieldToFilter('customer_id', ['eq' => $customerId])
-            ->getColumnValues('category_id');
-
-        $productCollection = $this->customerprice->getCollection()
-            ->addFieldToSelect('*')
-            ->addFieldToFilter('customer_id', ['eq' => $customerId])
-            ->getColumnValues('product_id');
-
-        if(!empty($categoryCollection)) {
-            foreach ($categoryCollection as $key => $product) {
-                $category = $this->categoryFactory->create()->load($product);
-                $ids[] = $category->getProductCollection()->getAllIds();
-            }
-            foreach ($ids as $id) {
-                $result = array_unique(array_merge($result,$id));
-            }
-            if(!empty($productCollection)) {
-                $allIds = array_unique(array_merge($result,$productCollection));
-            } else {
-                $allIds = $result;
-            }
-        } else {
-            if(!empty($productCollection)) {
-                $allIds = $productCollection;
-            }
-        }
-        if(empty($allIds)) {
-            return $collection->addIdFilter(array('in' => 0));
-        } else {
-            foreach ($allIds as $productId) {
-                $item = $this->mdproductcollection->create()->load($productId);
-                if ($item->getVisibility() == 1) {
-                    $configurableIds[] = $this->configurable->getParentIdsByChild($productId);
+    
+    public function getCategories()
+    {
+        $customerId = $this->customerSession->create()->getCustomerId();
+        $collections = $this->categoryprice->getCollection()
+                ->addFieldToFilter('customer_id', ['eq' => $customerId])
+                ->getColumnValues('category_id');
+        return $collections;
+    }
+    
+    public function getCustomerProductIds()
+    {
+        $customerId = $this->customerSession->create()->getCustomerId();
+        $collections = $this->customerprice->getCollection()
+                        ->addFieldToSelect('*')
+                        ->addFieldToFilter('customer_id', ['eq' => $customerId]);
+        $product_ids = [];
+        $parent_product_ids = [];
+        if ($collections->getSize() > 0) {
+            foreach ($collections as $product) {
+                $product_ids[] = $product->getProductId();
+                $_product = $this->mdproductcollection->create()->load($product->getProductId());
+                if ($_product->getVisibility() == 1) {
+                    $parent_product_ids[] = $this->configurable->getParentIdsByChild($product->getProductId());
+                    $product_ids = array_diff($product_ids, [$product->getProductId()]);
                 }
-                $groupedIds[] = $this->grouped->getParentIdsByChild($productId);
-                $bundleIds[] = $this->type->getParentIdsByChild($productId);
+                //Grouped Product
+                $parent_product_ids[] = $this->grouped->getParentIdsByChild($product->getProductId());
+                //Bundle Product
+                $parent_product_ids[] = $this->type->getParentIdsByChild($product->getProductId());
             }
-            $parentProductIds = array_merge($configurableIds,$groupedIds,$bundleIds);
-            foreach ($parentProductIds as $ids) {
+            foreach ($parent_product_ids as $ids) {
                 if (is_array($ids) && !empty($ids)) {
-                    $productIds[] = $ids[0];
+                    $product_ids[] = $ids[0];
                 }
             }
-            $productIds = array_unique($productIds);
-            if(!empty($productIds)) {
-                return $collection->addIdFilter(array('in' => array_unique(array_merge($productIds,$allIds))));
-            }
-            return $collection->addIdFilter(array('in' => $allIds));
+            $product_ids = array_unique($product_ids);
         }
+        $categoryIds = $this->getCategories();
+//        $productCatIds = [];
+//        //echo "<pre>";
+//        //print_r($categoryIds);
+//
+//        foreach ($categoryIds as $categoryId) {
+//            //echo $categoryId;
+//            $product_collection = $this->categoryFactory->create()->load($categoryId)->getProductCollection()->addAttributeToSelect('*')->getColumnValues('entity_id');
+//            //print_r($product_collection);
+//            $productCatIds = array_merge($productCatIds,$product_collection);
+//        }
+        
+        
+        $collectioncat = $this->mdproductcollection->create()->getCollection()->addAttributeToSelect('entity_id');
+        $collectioncat->addCategoriesFilter(['in'=> $categoryIds]);
+        $prod = [];
+        foreach ($collectioncat as $collectionprod) {
+            $prod[] = $collectionprod->getId();
+        }
+        $product_ids_cat = [];
+        $parent_product_ids_cat = [];
+        if (count($prod) > 0) {
+            foreach ($prod as $productid) {
+                $product_ids_cat[] = $productid;
+            
+                $_product = $this->mdproductcollection->create()->load($productid);
+            
+                if ($_product->getVisibility() == 1) {
+                    $parent_product_ids_cat[] = $this->configurable->getParentIdsByChild($productid);
+                    $product_ids_cat = array_diff($product_ids_cat, [$productid]);
+                }
+                //Grouped Product
+                $parent_product_ids_cat[] = $this->grouped->getParentIdsByChild($productid);
+                //Bundle Product
+                $parent_product_ids_cat[] = $this->type->getParentIdsByChild($productid);
+            }
+            foreach ($parent_product_ids_cat as $ids) {
+                if (is_array($ids) && !empty($ids)) {
+                    $product_ids_cat[] = $ids[0];
+                }
+            }
+            $product_ids_cat = array_unique($product_ids_cat);
+        }
+        $mergeProductids = array_unique(array_merge($product_ids_cat, $product_ids));
+
+        return $mergeProductids;
     }
 }

@@ -21,6 +21,7 @@ class Categoryprice extends \Magento\Framework\Model\AbstractModel
      * @param \Magento\Framework\Model\ResourceModel\AbstractResource $resource
      * @param \Magento\Framework\Data\Collection\AbstractDb           $resourceCollection
      * @param array                                                   $data
+     * phpcs:disable Generic.CodeAnalysis.UselessOverridingMethod
      */
     public function __construct(
         \Magento\Framework\Model\Context $context,
@@ -34,7 +35,7 @@ class Categoryprice extends \Magento\Framework\Model\AbstractModel
 
     public function _construct()
     {
-        $this->_init('Magedelight\Customerprice\Model\ResourceModel\Categoryprice');
+        $this->_init(\Magedelight\Customerprice\Model\ResourceModel\Categoryprice::class);
     }
 
     public function checkIdentifier($identifier, $storeId)

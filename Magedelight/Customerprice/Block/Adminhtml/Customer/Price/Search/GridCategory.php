@@ -231,7 +231,7 @@ class GridCategory extends \Magento\Backend\Block\Widget\Grid\Extended
             'currency_code' => $this->getStore()->getCurrentCurrencyCode(),
             'rate' => $this->getStore()->getBaseCurrency()->getRate($this->getStore()->getCurrentCurrencyCode()),
             'index' => 'price',
-            'renderer' => 'Magedelight\Customerprice\Block\Adminhtml\Customer\Price\Search\Grid\Renderer\Price',
+            'renderer' => \Magedelight\Customerprice\Block\Adminhtml\Customer\Price\Search\Grid\Renderer\Price::class,
                 ]
         );
 
@@ -264,7 +264,12 @@ class GridCategory extends \Magento\Backend\Block\Widget\Grid\Extended
      */
     public function getGridUrl()
     {
-        return $this->getUrl('md_customerprice/*/loadblock', ['block' => 'customer_product_grid', '_current' => true, 'collapse' => null]);
+        return $this->getUrl(
+            'md_customerprice/*/loadblock',
+            ['block' => 'customer_product_grid',
+            '_current' => true,
+            'collapse' => null]
+        );
     }
 
     /**

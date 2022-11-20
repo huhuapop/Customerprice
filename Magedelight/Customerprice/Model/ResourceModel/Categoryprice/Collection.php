@@ -41,8 +41,8 @@ class Collection extends \Magento\Framework\Model\ResourceModel\Db\Collection\Ab
     public function _construct()
     {
         $this->_init(
-            'Magedelight\Customerprice\Model\Categoryprice',
-            'Magedelight\Customerprice\Model\ResourceModel\Categoryprice'
+            \Magedelight\Customerprice\Model\Categoryprice::class,
+            \Magedelight\Customerprice\Model\ResourceModel\Categoryprice::class
         );
     }
 }

@@ -49,19 +49,20 @@ class Export extends \Magento\Framework\Data\Form\Element\AbstractElement
     public function getElementHtml()
     {
         /** @var \Magento\Backend\Block\Widget\Button $buttonBlock  */
-        $buttonBlock = $this->getForm()->getParent()->getLayout()->createBlock('Magento\Backend\Block\Widget\Button');
+        $buttonBlock = $this->getForm()->getParent()
+            ->getLayout()->createBlock(\Magento\Backend\Block\Widget\Button::class);
 
         $params = ['website' => $buttonBlock->getRequest()->getParam('website')];
 
-        $url = $this->_backendUrl->getUrl('md_customerprice/index/export', $params);
+        $urlsPass = $this->_backendUrl->getUrl('md_customerprice/index/export', $params);
         $data = [
             'label' => __('Export CSV'),
-            'onclick' => "setLocation('".$url."' )",
+            'onclick' => "setLocation('".$urlsPass."' )",
             'class' => '',
         ];
 
-        $html = $buttonBlock->setData($data)->toHtml();
+        $htmlToPass = $buttonBlock->setData($data)->toHtml();
 
-        return $html;
+        return $htmlToPass;
     }
 }

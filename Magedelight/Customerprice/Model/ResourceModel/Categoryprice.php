@@ -55,25 +55,12 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     protected $_customerFactory;
 
     /**
-     * @var Categoryprice\CollectionFactory
-     */
-    protected $collectionFactory;
-
-    /**
-     * @var \Magedelight\Customerprice\Model\CategorypriceFactory
-     */
-    protected $categoryPriceFactory;
-
-    /**
-     * @param \Magento\Framework\Model\ResourceModel\Db\Context $context
-     * @param \Psr\Log\LoggerInterface $logger
+     * @param \Magento\Framework\Model\ResourceModel\Db\Context  $context
+     * @param \Psr\Log\LoggerInterface                           $logger
      * @param \Magento\Framework\App\Config\ScopeConfigInterface $coreConfig
-     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
-     * @param Filesystem $filesystem
-     * @param \Magento\Customer\Model\CustomerFactory $customerFactory
-     * @param Categoryprice\CollectionFactory $collectionFactory
-     * @param \Magedelight\Customerprice\Model\CategorypriceFactory $categoryPriceFactory
-     * @param string $connectionName
+     * @param \Magento\Store\Model\StoreManagerInterface         $storeManager
+     * @param \Magento\Framework\Filesystem                      $filesystem
+     * @param string                                             $connectionName
      */
     public function __construct(
         \Magento\Framework\Model\ResourceModel\Db\Context $context,
@@ -82,8 +69,7 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         \Magento\Store\Model\StoreManagerInterface $storeManager,
         \Magento\Framework\Filesystem $filesystem,
         \Magento\Customer\Model\CustomerFactory $customerFactory,
-        Categoryprice\CollectionFactory $collectionFactory,
-        \Magedelight\Customerprice\Model\CategorypriceFactory $categoryPriceFactory,
+        \Magento\Catalog\Model\Category $category,
         $connectionName = null
     ) {
         parent::__construct($context, $connectionName);
@@ -92,8 +78,6 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $this->_storeManager = $storeManager;
         $this->_filesystem = $filesystem;
         $this->_customerFactory = $customerFactory;
-        $this->collectionFactory = $collectionFactory;
-        $this->categoryPriceFactory = $categoryPriceFactory;
     }
 
     public function _construct()
@@ -105,7 +89,11 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
     {
         try {
             $this->_objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-            $uploader = $this->_objectManager->create('Magento\MediaStorage\Model\File\Uploader', ['fileId' => 'categorypriceimport']);
+            $uploader = $this->_objectManager->
+            create(
+                \Magento\MediaStorage\Model\File\Uploader::class,
+                ['fileId' => 'categorypriceimport']
+            );
         } catch (\Exception $e) {
             if ($e->getCode() == '666') {
                 return $this;
@@ -130,7 +118,8 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $headers = $stream->readCsv();
         if ($headers === false || count($headers) < 1) {
             $stream->close();
-            throw new \Magento\Framework\Exception\LocalizedException(__('Please correct Price Per Customer File Format.'));
+            throw new
+            \Magento\Framework\Exception\LocalizedException(__('Please correct Price Per Customer File Format.'));
         }
 
         $connection = $this->getConnection();
@@ -138,28 +127,27 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 
         try {
             $rowNumber = 1;
+            $importData = [];
 
             while (false !== ($csvLine = $stream->readCsv())) {
                 ++$rowNumber;
                 if (empty($csvLine)) {
                     continue;
                 }
-                $row = $this->_getImportRow($csvLine, $rowNumber, $headers);
+                $row = $this->_getImportRow($csvLine, $headers, $rowNumber);
+                //echo "<pre>"; print_r($row);
                 if ($row !== false && $row['category_id'] > 0 && $row['customer_id'] > 0) {
-                    $priceCollection = $this->collectionFactory->create()
-                                        ->addFieldToFilter('customer_email', $row['customer_email'])
-                                        ->addFieldToFilter('category_id', $row['category_id'])
-                                        ->getFirstItem()
-                                        ->getData();
-
-                    $priceCustomer = $this->categoryPriceFactory->create();
-                    $priceCustomer->setData($row);
-
+                    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+                    $priceCollection = $objectManager->
+                    create(\Magedelight\Customerprice\Model\ResourceModel\Categoryprice\CollectionFactory::class)
+                    ->create();
+                    $priceCollection->addFieldToFilter('category_id', $row['category_id']);
                     if (count($priceCollection) > 0) {
-                        $priceCustomer->setId($priceCollection['categoryprice_id']);
+                        continue;
                     }
-
-                    $priceCustomer->save();
+                    $priceCustomer = $objectManager->create(\Magedelight\Customerprice\Model\Categoryprice::class);
+                    
+                    $priceCustomer->setData($row)->save();
                 }
             }
             $stream->close();
@@ -189,7 +177,7 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         return $this;
     }
 
-    protected function _getImportRow($row, $rowNumber = 0, $headers)
+    protected function _getImportRow($row, $headers, $rowNumber = 0)
     {
         if (count($row) < 3) {
             //echo "hiii";
@@ -221,7 +209,12 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
 
                 return false;
             } elseif (is_numeric($matches[1]) && ($matches[1] <= 0 || $matches[1] > 100)) {
-                $this->_importErrors[] = __('Invalid New Price "%1" in the Row #%2.Percentage should be greater than 0 and less or equals than 100.', $row[$discount], $rowNumber);
+                $this->_importErrors[] = __(
+                    'Invalid New Price "%1" in the Row #%2.
+                Percentage should be greater than 0 and less or equals than 100.',
+                    $row[$discount],
+                    $rowNumber
+                );
 
                 return false;
             }
@@ -255,9 +248,7 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
         $customerId = $customer->getId();
         
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        //$this->getCategoryChild($cat);
-        $category = $objectManager->get('Magento\Catalog\Model\Category')->load($cat);
-
+        $category = $objectManager->get(\Magento\Catalog\Model\Category::class)->load($cat);
         $categoryName = $category->getName();
        
         return [
@@ -269,13 +260,14 @@ class Categoryprice extends \Magento\Framework\Model\ResourceModel\Db\AbstractDb
             'discount' => $discount, //discont
         ];
     }
-    
-    function getCategoryChild($cat)
+    //@codingStandardsIgnoreStart
+    public function getCategoryChild($cat)
     {
         $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
         $explodeCats = explode('/', $cat);
         foreach ($explodeCats as $explodeCat) {
-            $category = $objectManager->get('Magento\Catalog\Model\Category')->loadByAttribute('name', $cat);
+            $category = $objectManager->get(\Magento\Catalog\Model\Category::class)
+                ->loadByAttribute('name', $cat);
         }
         return ;
     }

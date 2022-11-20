@@ -1,22 +1,22 @@
 <?php
 /**
-* Magedelight
-* Copyright (C) 2017 Magedelight <info@Magedelight.com>
-*
-* @category Magedelight
-* @package Magedelight_Customerprice
-* @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
-* @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
-* @author Magedelight <info@Magedelight.com>
-*/
+ * Magedelight
+ * Copyright (C) 2017 Magedelight <info@Magedelight.com>
+ *
+ * @category Magedelight
+ * @package Magedelight_Customerprice
+ * @copyright Copyright (c) 2017 Mage Delight (http://www.Magedelight.com/)
+ * @license http://opensource.org/licenses/gpl-3.0.html GNU General Public License,version 3 (GPL-3.0)
+ * @author Magedelight <info@Magedelight.com>
+ */
 ?>
 <?php
 /**
  * @var $block \Magento\Sales\Block\Adminhtml\Order\Create\Items\Grid
  */
 ?>
-
-<?php $_items =json_decode($this->getOptionValues()) ?>
+<?php $_items =json_decode($block->getOptionValues()) ?>
+<?php $block->getWebsites() ?>
 <?php if (empty($_items)): ?>
         
     <div id="order-items_grid">
@@ -24,22 +24,31 @@
             <table class="data-table admin__table-primary order-tables" id="attribute-options-table">
                 <thead>
                     <tr class="headings">
-                        <th class="col-customer"><span><?php /* @escapeNotVerified */ echo __('Customer ID') ?></span></th>
-                        <th class="col-customer-name"><span><?php /* @escapeNotVerified */ echo __('Customer Name') ?></span></th>
-                        <th class="col-email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></th>
-                        <th class="col-special-price required-ppc"><span><?php /* @escapeNotVerified */ echo __('Special Price') ?></span></th>
-                        <th class="col-qty required-ppc"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
-                        <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+                        <th class="col-website">
+                            <span><?php /* @escapeNotVerified */ echo __('Website') ?></span>
+                        </th>
+                        <th class="col-customer"><span><?= /* @noEscape */ __('Customer ID') ?></span></th>
+                        <th class="col-customer-name"><span><?= /* @noEscape */ __('Customer Name') ?></span></th>
+                        <th class="col-email"><span><?= /* @noEscape */ __('Email') ?></span></th>
+                        <th class="col-special-price required-ppc">
+                            <span>
+                                <?= /* @noEscape */ __('Special Price') ?>
+                            </span>
+                        </th>
+                        <th class="col-qty required-ppc"><span><?= /* @noEscape */ __('Qty') ?></span></th>
+                        <th class="col-action"><span><?= /* @noEscape */ __('Action') ?></span></th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="even" id="no-customer">
-                        <td class="empty-text" colspan="100"><?php /* @escapeNotVerified */ echo __('No customer selected') ?></td>
+                        <td class="empty-text" colspan="100"><?= /* @noEscape */ __('No customer selected') ?></td>
                     </tr>
                 </tbody>
             </table>
             <input type="hidden" data-form-part="product_form" id="option-count-check" value="" />
-             <input type="hidden" data-form-part="product_form" name="product_id" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+             <input type="hidden" data-form-part="product_form"
+                    name="product_id"
+                    value="<?= /* @noEscape */ $block->getRequest()->getParam("id") ?>" />
         </div>
     </div>
 
@@ -51,45 +60,86 @@
         <table class="data-table admin__table-primary order-tables" id="attribute-options-table">
             <thead>
                 <tr class="headings">
-                    <th class="col-customer"><span><?php /* @escapeNotVerified */ echo __('Customer ID') ?></span></th>
-                    <th class="col-customer-name"><span><?php /* @escapeNotVerified */ echo __('Customer Name') ?></span></th>
-                    <th class="col-email"><span><?php /* @escapeNotVerified */ echo __('Email') ?></span></th>
-                    <th class="col-special-price"><span><?php /* @escapeNotVerified */ echo __('Special Price') ?></span></th>
-                    <th class="col-qty"><span><?php /* @escapeNotVerified */ echo __('Qty') ?></span></th>
-                    <th class="col-action"><span><?php /* @escapeNotVerified */ echo __('Action') ?></span></th>
+                    <th class="col-website">
+                        <span><?php /* @escapeNotVerified */ echo __('Website') ?></span>
+                    </th>
+                    <th class="col-customer"><span><?= /* @noEscape */ __('Customer ID') ?></span></th>
+                    <th class="col-customer-name"><span><?= /* @noEscape */ __('Customer Name') ?></span></th>
+                    <th class="col-email"><span><?= /* @noEscape */ __('Email') ?></span></th>
+                    <th class="col-special-price"><span><?= /* @noEscape */ __('Special Price') ?></span></th>
+                    <th class="col-qty"><span><?= /* @noEscape */ __('Qty') ?></span></th>
+                    <th class="col-action"><span><?= /* @noEscape */ __('Action') ?></span></th>
                 </tr>
             </thead>
         
                 <?php $i = 0 ?>
                 
-                <tbody class="<?php /* @escapeNotVerified */ echo($i%2) ? 'even' : 'odd' ?>">
+                <tbody class="<?php /* @noEscape */ ($i%2) ? 'even' : 'odd' ?>">
                
                 <tr class="even" id="no-customer" style="display:none">
-                        <td class="empty-text" colspan="100"><?php /* @escapeNotVerified */ echo __('No customer selected') ?></td>
+                        <td class="empty-text" colspan="100"><?= /* @noEscape */ __('No customer selected') ?></td>
                     </tr>
                 <?php foreach ($_items as $_item):$i++ ?>
                     <tr class="option-row">
                         <td>
-                            <span><?php echo $_item->cid ?></span>
-                            <input data-form-part="product_form" type="hidden" name="option[value][<?php echo $_item->id ?>][cid]" value="<?php echo $_item->cid ?>" />
-                        </td> 
-                        <td>
-                            <span><?php echo $_item->cname ?></span>
-                            <input data-form-part="product_form" type="hidden" name="option[value][<?php echo $_item->id ?>][cname]" value="<?php echo $_item->cname ?>" />
-                        </td> 
-                        <td>
-                            <span><?php echo $_item->email ?></span>
-                            <input data-form-part="product_form" type="hidden" name="option[value][<?php echo $_item->id ?>][email]" value="<?php echo $_item->email ?>" />
+                            <select class="admin__control-select"
+                                    name="option[value][<?php echo $_item->id ?>][website]"
+                                    data-form-part="product_form">
+                                <?php $websites =  $block->getWebsites();
+                                foreach($websites as $key => $value): ?>
+                                    <option value="<?php echo $key ?>"
+                                            <?php echo $key == $_item->website ? 'selected': ''?>>
+                                        <?php echo $value['name'].' '.$value['currency']?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </td>
                         <td>
-                            <input data-form-part="product_form" style="width:50%;" class="required-entry validate-zero-or-greater input-text admin__control-text required-entry _required" type="text" name="option[value][<?php echo $_item->id ?>][newprice]" value="<?php echo $_item->newprice ?>">
+                            <span><?= /* @noEscape */ $_item->cid ?></span>
+                            <input data-form-part="product_form"
+                                   type="hidden"
+                                   name="option[value][<?= /* @noEscape */ $_item->id ?>][cid]"
+                                   value="<?= /* @noEscape */ $_item->cid ?>" />
                         </td> 
                         <td>
-                            <input data-form-part="product_form" style="width:20px;" class="input-text admin__control-text qty required-entry validate-greater-than-zero" type="text" name="option[value][<?php echo $_item->id ?>][qty]" value="<?php echo $_item->qty ?>"> and above
+                            <span><?= /* @noEscape */ $_item->cname ?></span>
+                            <input data-form-part="product_form"
+                                   type="hidden"
+                                   name="option[value][<?= /* @noEscape */ $_item->id ?>][cname]"
+                                   value="<?= /* @noEscape */ $_item->cname ?>" />
+                        </td> 
+                        <td>
+                            <span><?= /* @noEscape */ $_item->email ?></span>
+                            <input data-form-part="product_form"
+                                   type="hidden"
+                                   name="option[value][<?= /* @noEscape */ $_item->id ?>][email]"
+                                   value="<?= /* @noEscape */ $_item->email ?>" />
+                        </td>
+                        <td>
+                            <input data-form-part="product_form"
+                                   style="width:50%;"
+                                   class="required-entry validate-zero-or-greater
+                                          input-text admin__control-text required-entry _required"
+                                   type="text" name="option[value][<?= /* @noEscape */ $_item->id ?>][newprice]"
+                                   value="<?= /* @noEscape */ $_item->newprice ?>">
+                        </td> 
+                        <td>
+                            <input data-form-part="product_form" style="width:20px;"
+                                   class="input-text admin__control-text qty required-entry validate-greater-than-zero"
+                                   type="text" name="option[value][<?= /* @noEscape */ $_item->id ?>][qty]"
+                                   value="<?= /* @noEscape */ $_item->qty ?>">
+                                   and above
                         </td>  
-                        <td id="delete_button_container_<?php echo $_item->id ?>">
-                        <input data-form-part="product_form" type="hidden" class="delete-flag" name="option[value][<?php echo $_item->id ?>][del]" value="" />
-                        <input data-form-part="product_form" type="hidden" class="delete-flag" name="option[value][<?php echo $_item->id ?>][pid]" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+                        <td id="delete_button_container_<?= /* @noEscape */ $_item->id ?>">
+                        <input data-form-part="product_form"
+                               type="hidden"
+                               class="delete-flag"
+                               name="option[value][<?= /* @noEscape */ $_item->id ?>][del]"
+                               value="" />
+                        <input data-form-part="product_form"
+                               type="hidden" class="delete-flag"
+                               name="option[value][<?= /* @noEscape */ $_item->id ?>][pid]"
+                               value="<?= /* @noEscape */ $block->getRequest()->getParam("id") ?>" />
                         <button class="action-delete delete-option" type="button"><span>Remove Product</span></button> 
                         </td> 
 
@@ -100,14 +150,11 @@
                 
         </table>
         <input type="hidden" data-form-part="product_form" id="option-count-check" value="" />
-        <input type="hidden" data-form-part="product_form" name="product_id" value="<?php echo $this->getRequest()->getParam("id") ?>" />
+        <input type="hidden" data-form-part="product_form"
+               name="product_id" value="<?= /* @noEscape */ $block->getRequest()->getParam("id") ?>" />
        
             </div>
         </div>
-
-
-   
-
 <?php endif; ?>
 
 
