@@ -178,6 +178,7 @@ class CustomerSaveAfter implements ObserverInterface
                     }
                 }
             }
+
             if (isset($options['categoryoption'])) {
                 foreach ($options['categoryoption'] as $key => $_options) {
                     
@@ -187,10 +188,10 @@ class CustomerSaveAfter implements ObserverInterface
                             ->addFieldToSelect('*')
                             ->addFieldToFilter('customer_id', $customerId);
 
-                    if(!empty($priceCustomerCategory->getData()))
-                    {
-                        array_splice($_options, 0, 1);
-                    }
+//                    if(!empty($priceCustomerCategory->getData()))
+//                    {
+//                        array_splice($_options, 0, 1);
+//                    }
                     foreach ($_options as $k => $value) {
                        
                         if ($key == 'value') {
